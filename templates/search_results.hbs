@@ -32,8 +32,13 @@
               {{else}}
                 <a href="{{url}}" class="sidenav-item">
               {{/if}}
-                  <span class="sidenav-subitem filter-name">{{name}}</span>
-                  <span class="sidenav-subitem doc-count">({{count}})</span>
+                  {{#is name 'Alle Help Centers'}}
+                    <span class="sidenav-subitem filter-name">Alle Supportfora</span>
+                    <span class="sidenav-subitem doc-count">({{count}})</span>
+                  {{else}}
+                    <span class="sidenav-subitem filter-name">{{name}}</span>
+                    <span class="sidenav-subitem doc-count">({{count}})</span>
+                  {{/is}}
                 </a>
               </li>
             {{/each}}
@@ -176,7 +181,7 @@
                     </ol>
                   </li>
                   {{#unless is_external}}
-                    <li class="meta-data">{{author.name}}</li>
+                    <!-- <li class="meta-data">{{author.name}}</li> -->
                   {{/unless}}
                   <li class="meta-data">{{date created_at}}</li>
                 </ul>

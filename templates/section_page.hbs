@@ -24,7 +24,7 @@
       </header>
 
       {{#if section.sections}}
-        <ul class="section-list">
+        <ul class="section-list section-list--collapsed">
           {{#each section.sections}}
           <li class="section-list-item">
               <a href="{{url}}">
@@ -43,6 +43,8 @@
       {{#if section.articles}}
         <ul class="article-list">
           {{#each section.articles}}
+          <!-- Hides article -->
+            {{#isnt id 360018480619}}
             <li class="article-list-item {{#if promoted}} article-promoted{{/if}}">
               {{#if promoted}}
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" focusable="false" viewBox="0 0 12 12" class="icon-star" title="{{t 'promoted'}}">
@@ -57,6 +59,7 @@
                 </svg>
               {{/if}}
             </li>
+            {{/isnt}}
           {{/each}}
         </ul>
       {{else}}

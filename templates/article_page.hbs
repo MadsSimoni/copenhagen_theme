@@ -74,11 +74,12 @@
 
             <ul class="meta-group">
               {{#is article.created_at article.edited_at}}
-                <li class="meta-data">{{date article.created_at timeago=true}}</li>
+                <li class="meta-data">{{date article.created_at timeago=false}}</li>
               {{else}}
-                <li class="meta-data">{{date article.edited_at timeago=true}}</li>
+                <li class="meta-data">{{date article.edited_at timeago=false}}</li>
                 <li class="meta-data">{{t 'updated'}}</li>
               {{/is}}
+              <li class="meta-data"><a href="javascript:window.print();"><img alt="print" src="{{asset 'printikon.png'}}">Udskriv</a></li>
             </ul>
           </div>
         </div>
@@ -110,6 +111,10 @@
             </div>
           {{/if}}
         </div>
+        <div class="article-ihlp">
+            <hr>
+            <a href="https://ihlp.kirkenettet.dk/PopUp.aspx?popup=customtemplate&subaction=pcsupport&relationname=RequestIncidentItempcsupport&label=PC-Support"><p>Har du stadig brug for hjælp så opret en ihlp sag i IHLP her</p></a>
+        </div>
       </section>
 
       <footer>
@@ -134,6 +139,7 @@
           {{/if}}
         </div>
         {{#with article}}
+        <!--
           <div class="article-votes">
             <span class="article-votes-question" id="article-votes-label">{{t 'was_this_article_helpful'}}</span>
             <div class="article-votes-controls" role="group" aria-labelledby="article-votes-label">
@@ -143,12 +149,12 @@
             <small class="article-votes-count">
               {{vote 'label' class='article-vote-label'}}
             </small>
-          </div>
+          </div> -->
         {{/with}}
 
-        <div class="article-more-questions">
+        <!-- <div class="article-more-questions">
           {{request_callout}}
-        </div>
+        </div> -->
         <div class="article-return-to-top">
           <a href="#article-container">
             {{t 'return_to_top'}}

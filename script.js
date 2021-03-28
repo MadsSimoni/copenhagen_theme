@@ -399,3 +399,20 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
+
+// Notifikations banner
+
+let alertBox = document.getElementById("alertbox");
+
+fetch('/api/v2/help_center/articles.json?label_names=drift')
+    .then((resp) => resp.json())
+    .then(function (data) {
+      data.articles.forEach(item => {
+        let alertItem = '<div class="ns-box ns-bar ns-effect-slidetop ns-type-notice ns-show"><div class="ns-box-inner"><span class="megaphone"></span></i><p><a href="' + item.html_url + '">' + item.title + ' | Tryk her for at læse mere</a>' + '</p></div><span class="ns-close" onclick="closealert()"></span></div>'
+        alertBox.insertAdjacentHTML('afterbegin', alertItem);
+      });
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+function closealert(){alertBox.remove();}
