@@ -12,11 +12,11 @@
     padding: 0 30px;
   }
   
-  p a {
+  flex: 1 0 auto; //Explicit values needed whith flex-direction: column for IE11
+
+  & p a {
     text-decoration: underline;
   }
-
-  flex: 1 0 auto; //Explicit values needed whith flex-direction: column for IE11
 
   &-container {
     @include desktop {
