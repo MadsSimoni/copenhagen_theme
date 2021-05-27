@@ -1,7 +1,7 @@
 {
   "name": "PC-Support",
   "author": "Zendesk",
-  "version": "2.9.5",
+  "version": "2.9.6",
   "api_version": 2,
   "default_locale": "en-us",
   "settings": [
@@ -217,7 +217,7 @@
           "type": "checkbox",
           "description": "show_brand_name_description",
           "label": "show_brand_name_label",
-          "value": false
+          "value": true
         },
         {
           "identifier": "favicon",
