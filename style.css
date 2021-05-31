@@ -1633,6 +1633,10 @@ ul {
   list-style-type: disc;
 }
 
+.article-body a {
+  text-decoration: underline;
+}
+
 .article-body a:visited {
   color: $visited_link_color;
 }
