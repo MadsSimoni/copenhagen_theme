@@ -14,10 +14,6 @@
   
   flex: 1 0 auto; //Explicit values needed whith flex-direction: column for IE11
 
-  & p a {
-    text-decoration: underline;
-  }
-
   &-container {
     @include desktop {
       flex-direction: row;
@@ -80,6 +76,10 @@
   &-body {
     @include content-body;
     > p:last-child { margin-bottom: 0; }
+  }
+  
+  &-body a {
+    text-decoration: underline;
   }
 
   &-content {
