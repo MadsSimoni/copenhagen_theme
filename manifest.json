@@ -1,7 +1,7 @@
 {
   "name": "PC-Support",
   "author": "Zendesk",
-  "version": "2.10.1",
+  "version": "2.11.1",
   "api_version": 2,
   "default_locale": "en-us",
   "settings": [
@@ -13,7 +13,7 @@
           "type": "color",
           "description": "brand_color_description",
           "label": "brand_color_label",
-          "value": "rgba(0, 0, 0, 1)"
+          "value": "#17494D"
         },
         {
           "identifier": "brand_text_color",
@@ -27,21 +27,21 @@
           "type": "color",
           "description": "text_color_description",
           "label": "text_color_label",
-          "value": "#333333"
+          "value": "#2F3941"
         },
         {
           "identifier": "link_color",
           "type": "color",
           "description": "link_color_description",
           "label": "link_color_label",
-          "value": "rgba(37, 87, 136, 1)"
+          "value": "#1F73B7"
         },
         {
           "identifier": "visited_link_color",
           "type": "color",
           "description": "visited_link_color_description",
           "label": "visited_link_color_label",
-          "value": "rgba(37, 87, 136, 1)"
+          "value": "#4B61C3"
         },
         {
           "identifier": "background_color",
@@ -303,21 +303,21 @@
           "type": "checkbox",
           "description": "article_author_description",
           "label": "article_author_label",
-          "value": false
+          "value": true
         },
         {
           "identifier": "show_article_comments",
           "type": "checkbox",
           "description": "article_comments_description",
           "label": "article_comments_label",
-          "value": false
+          "value": true
         },
         {
           "identifier": "show_follow_article",
           "type": "checkbox",
           "description": "follow_article_description",
           "label": "follow_article_label",
-          "value": false
+          "value": true
         },
         {
           "identifier": "show_recently_viewed_articles",
@@ -338,7 +338,7 @@
           "type": "checkbox",
           "description": "article_sharing_description",
           "label": "article_sharing_label",
-          "value": false
+          "value": true
         }
       ]
     },
@@ -350,7 +350,7 @@
           "type": "checkbox",
           "description": "follow_section_description",
           "label": "follow_section_label",
-          "value": false
+          "value": true
         }
       ]
     },
@@ -362,14 +362,14 @@
           "type": "checkbox",
           "description": "follow_post_description",
           "label": "follow_post_label",
-          "value": false
+          "value": true
         },
         {
           "identifier": "show_post_sharing",
           "type": "checkbox",
           "description": "post_sharing_description",
           "label": "post_sharing_label",
-          "value": false
+          "value": true
         }
       ]
     },
@@ -381,7 +381,7 @@
           "type": "checkbox",
           "description": "follow_topic_description",
           "label": "follow_topic_label",
-          "value": false
+          "value": true
         }
       ]
     }
