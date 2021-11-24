@@ -1,3 +1,31 @@
+## [2.12.2](https://github.com/zendesk/copenhagen_theme/compare/v2.12.1...v2.12.2) (2021-11-24)
+
+
+### Bug Fixes
+
+* search input field background color in iOS ([1e0059e](https://github.com/zendesk/copenhagen_theme/commit/1e0059ed1961c7580f644e6fed72539601c7d58a))
+
+## [2.12.1](https://github.com/zendesk/copenhagen_theme/compare/v2.12.0...v2.12.1) (2021-11-23)
+
+
+### Bug Fixes
+
+* Remove refs to AppleGothic ([8951af5](https://github.com/zendesk/copenhagen_theme/commit/8951af5290537984e8b2297e9a60ef796c98c6b4))
+
+# [2.12.0](https://github.com/zendesk/copenhagen_theme/compare/v2.11.2...v2.12.0) (2021-11-10)
+
+
+### Features
+
+* menu item for upcoming contact details modal ([57b7a94](https://github.com/zendesk/copenhagen_theme/commit/57b7a94e9542f60111a03b37444ff43a672a3800))
+
+## [2.11.2](https://github.com/zendesk/copenhagen_theme/compare/v2.11.1...v2.11.2) (2021-10-07)
+
+
+### Bug Fixes
+
+* Adding topic ID to the bottom New post button ([4d06689](https://github.com/zendesk/copenhagen_theme/commit/4d066890e68f529275e7fc34cc296ff52dc648f3))
+
 ## [2.11.1](https://github.com/zendesk/copenhagen_theme/compare/v2.11.0...v2.11.1) (2021-09-15)
 
 
