@@ -4873,6 +4873,7 @@ html[dir="rtl"] .notification-left-aligned {
 /* change the background color by editing "background"  */
 /* change the text color by editing "color"  */
 .ns-box {
+  position: relative;
   background: rgba(119, 14, 4,0.85);
   padding: 10px 20px 20px 20px;
   line-height: 1.5;
