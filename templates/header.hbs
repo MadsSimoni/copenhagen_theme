@@ -8,15 +8,16 @@
         <span aria-hidden="true">{{help_center.name}}</span>
       {{/if}}
     {{/link}}
+      <h1 style="font-size: 1.3em; font-weight: bold;">{{ help_center.name }}</h1>
   </div>
 
   <div class="nav-wrapper-desktop">
     <nav class="user-nav" id="user-nav">
       <ul class="user-nav-list">
         <li>{{link 'community'}}</li>
-        <a href="https://intranet.kirkenettet.dk">Login på Kirkenettet</a>
-        <!--<li>{{link 'new_request' class='submit-a-request'}}</li>-->
-        <!--{{#unless signed_in}}
+        <li><a href="https://personregistrering.zendesk.com/hc/da/articles/360022110219" role="article" alt="Læs omkring personforum">Om personregistrering.dk</a></li>
+    <!--<li>{{link 'new_request' class='submit-a-request'}}</li>-->
+    <!--{{#unless signed_in}}
           <li>
             {{#link "sign_in" class="sign-in"}}
               {{t 'sign_in'}}
@@ -84,14 +85,13 @@
           <li class="nav-divider"></li>
         {{/if}}
         <li class="item">{{link 'community' role="menuitem"}}</li>
-        <!--<li class="item">{{link 'new_request' role="menuitem" class='submit-a-request'}}</li>-->
+    <!--<li class="item">{{link 'new_request' role="menuitem" class='submit-a-request'}}</li>-->
         <li class="nav-divider"></li>
         {{#if signed_in}}
           <li class="item">
             {{link "sign_out" role="menuitem"}}
           </li>
         {{/if}}
-        </li>
       </ul>
     </nav>
   </div>

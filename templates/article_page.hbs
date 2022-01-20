@@ -74,9 +74,9 @@
 
             <ul class="meta-group">
               {{#is article.created_at article.edited_at}}
-                <li class="meta-data">{{date article.created_at timeago=false}}</li>
+                <li class="meta-data">{{date article.created_at timeago=true}}</li>
               {{else}}
-                <li class="meta-data">{{date article.edited_at timeago=false}}</li>
+                <li class="meta-data">{{date article.edited_at timeago=true}}</li>
                 <li class="meta-data">{{t 'updated'}}</li>
               {{/is}}
               <li class="meta-data"><a href="javascript:window.print();"><img alt="print" src="{{asset 'print.png'}}">Udskriv</a></li>
@@ -110,10 +110,6 @@
               </ul>
             </div>
           {{/if}}
-        </div>
-        <div class="article-ihlp">
-            <hr>
-            <a href="https://support.kirkenettet.dk/hc/da/articles/360021991459">Har du stadig brug for hjælp så opret en ihlp sag i IHLP her</a>
         </div>
       </section>
 
