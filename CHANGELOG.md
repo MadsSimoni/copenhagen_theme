@@ -1,3 +1,62 @@
+## [2.21.2](https://github.com/zendesk/copenhagen_theme/compare/v2.21.1...v2.21.2) (2023-03-15)
+
+
+### Bug Fixes
+
+* **search:** update search result markup to improve a11y ([940b5cf](https://github.com/zendesk/copenhagen_theme/commit/940b5cf0a23ec5ac79960be245cdfb2bb94be67a))
+* **user-profile:** update breadcrumbs markup to improve a11y ([ae6506c](https://github.com/zendesk/copenhagen_theme/commit/ae6506ce2c3eb3ab474c17ba1f7b679af99282b0))
+
+## [2.21.1](https://github.com/zendesk/copenhagen_theme/compare/v2.21.0...v2.21.1) (2023-02-08)
+
+
+### Bug Fixes
+
+* **badges:** render badges as lists ([f89c264](https://github.com/zendesk/copenhagen_theme/commit/f89c2647a72e08a043e5ee8f25b4a63ac30b1614))
+
+# [2.21.0](https://github.com/zendesk/copenhagen_theme/compare/v2.20.1...v2.21.0) (2023-02-08)
+
+
+### Features
+
+* Add a11y to new-post field error messages ([5b53797](https://github.com/zendesk/copenhagen_theme/commit/5b53797da863ba271c94e8bb129b3d8b9ec4d4a8))
+
+## [2.20.1](https://github.com/zendesk/copenhagen_theme/compare/v2.20.0...v2.20.1) (2022-12-15)
+
+
+### Bug Fixes
+
+* improve meta-data markup to better assist a11y tools ([81e11d3](https://github.com/zendesk/copenhagen_theme/commit/81e11d3076ecda9c5893db4e281ba895d1125388))
+* Remove duplicate header to improve screen reader exp ([c28ca15](https://github.com/zendesk/copenhagen_theme/commit/c28ca150bdd4521624a9b264bebc9f62b999c371))
+* **styles:** fix padding on activity header ([efa0929](https://github.com/zendesk/copenhagen_theme/commit/efa0929a0fe98c2ab5460f8367c1334a7f3f839b))
+
+# [2.20.0](https://github.com/zendesk/copenhagen_theme/compare/v2.19.5...v2.20.0) (2022-12-14)
+
+
+### Features
+
+* aria descriptions on vote controls ([6500305](https://github.com/zendesk/copenhagen_theme/commit/65003055e31593dd0e49545f8a863d8e772badd6))
+
+## [2.19.5](https://github.com/zendesk/copenhagen_theme/compare/v2.19.4...v2.19.5) (2022-12-12)
+
+
+### Bug Fixes
+
+* increase border contrast ratio for more theme elements ([d32f6b3](https://github.com/zendesk/copenhagen_theme/commit/d32f6b33248050a7e54e9513388217ef97f502df))
+
+## [2.19.4](https://github.com/zendesk/copenhagen_theme/compare/v2.19.3...v2.19.4) (2022-11-30)
+
+
+### Bug Fixes
+
+* improve contrast for input elements ([e73ddc8](https://github.com/zendesk/copenhagen_theme/commit/e73ddc87811face141873c5ef342f6cb9d23b4f5)), closes [#87929](https://github.com/zendesk/copenhagen_theme/issues/87929)
+
+## [2.19.3](https://github.com/zendesk/copenhagen_theme/compare/v2.19.2...v2.19.3) (2022-11-29)
+
+
+### Bug Fixes
+
+* Remove aria-expanded from sections in search_result page ([8fccb2a](https://github.com/zendesk/copenhagen_theme/commit/8fccb2a4eb24fb6a046baafc3438e9759a0a6286))
+
 ## [2.19.2](https://github.com/zendesk/copenhagen_theme/compare/v2.19.1...v2.19.2) (2022-11-10)
 
 
