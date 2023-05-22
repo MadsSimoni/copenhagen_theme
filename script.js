@@ -547,7 +547,7 @@
 // MW-Notification Banner
 document.addEventListener('DOMContentLoaded', async function () {
   // Article label to be considered for the alerts
-  const label = 'drift'
+  const label = 'drift,Drift'
 
   // Get current help center locale
   const locale = document
