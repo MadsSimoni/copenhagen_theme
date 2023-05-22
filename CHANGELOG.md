@@ -1,3 +1,17 @@
+## [2.21.4](https://github.com/zendesk/copenhagen_theme/compare/v2.21.3...v2.21.4) (2023-05-16)
+
+
+### Bug Fixes
+
+* disable skip-navigation link when modals show ([ceaf6b7](https://github.com/zendesk/copenhagen_theme/commit/ceaf6b74f80f121ef3e45e05cbfc14352605f432))
+
+## [2.21.3](https://github.com/zendesk/copenhagen_theme/compare/v2.21.2...v2.21.3) (2023-05-04)
+
+
+### Bug Fixes
+
+* upgrade node-fetch from 2.6.7 to 2.6.9 ([c5774c3](https://github.com/zendesk/copenhagen_theme/commit/c5774c3800691b958063fc7cfe37f2c6a2f58af9))
+
 ## [2.21.2](https://github.com/zendesk/copenhagen_theme/compare/v2.21.1...v2.21.2) (2023-03-15)
 
 
