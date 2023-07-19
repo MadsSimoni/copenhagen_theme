@@ -1,7 +1,7 @@
 {
   "name": "PC-Support",
   "author": "Zendesk",
-  "version": "3.0.1",
+  "version": "3.0.6",
   "api_version": 3,
   "default_locale": "en-us",
   "settings": [

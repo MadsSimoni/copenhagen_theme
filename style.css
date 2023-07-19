@@ -862,7 +862,8 @@ ul {
   left: initial;
   right: auto;
 }
-.skip-navigation #zd-modal-container ~ .skip-navigation {
+
+#zd-modal-container ~ .skip-navigation {
   display: none;
 }
 
@@ -1155,6 +1156,8 @@ ul {
   .page-header {
     align-items: baseline;
     flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 16px;
     margin: 0;
   }
 }
@@ -1420,6 +1423,8 @@ ul {
 }
 .recent-activity-item-link {
   font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .recent-activity-item-meta {
   color: $text_color;
@@ -1497,6 +1502,7 @@ ul {
 }
 .category-content {
   flex: 1;
+  max-width: 100%;
 }
 @media (min-width: 1024px) {
   .category-content {
@@ -1517,6 +1523,7 @@ ul {
 }
 .section-tree .section {
   flex: initial;
+  max-width: 100%;
 }
 @media (min-width: 768px) {
   .section-tree .section {
@@ -1539,6 +1546,8 @@ ul {
 .article-list-item {
   font-size: 16px;
   padding: 15px 0;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .article-list-item a {
   color: $text_color;
@@ -1556,6 +1565,7 @@ ul {
 }
 .section-content {
   flex: 1;
+  max-width: 100%;
 }
 @media (min-width: 1024px) {
   .section-content {
@@ -1637,6 +1647,11 @@ ul {
 }
 .article-author {
   margin-bottom: 10px;
+}
+.article-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 @media (min-width: 768px) {
   .article-title {
@@ -1816,6 +1831,7 @@ ul {
     border: 0;
     flex: 0 0 17%;
     height: auto;
+    max-width: 17%;
   }
 }
 .article-relatives {
@@ -1904,6 +1920,8 @@ ul {
   display: block;
   margin-top: 10px;
   margin-bottom: 16px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .recent-articles li,
