@@ -47,6 +47,10 @@
   }
 
   &-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+
     @include tablet {
       flex-basis: 100%; /* Take entire row */
     }
@@ -119,10 +123,11 @@
       border: 0;
       flex: 0 0 17%;
       height: auto;
+      max-width: 17%;
     }
 
-    border-bottom: 1px solid $border-color;
-    border-top: 1px solid $border-color;
+    border-bottom: 1px solid $low-contrast-border-color;
+    border-top: 1px solid $low-contrast-border-color;
     flex: 1 0 auto; //Explicit values needed whith flex-direction: column for IE11
     margin-bottom: 20px;
     padding: 0;
@@ -133,7 +138,7 @@
       flex-direction: row;
     }
 
-    border-top: 1px solid $border-color;
+    border-top: 1px solid $low-contrast-border-color;
     display: flex;
     flex-direction: column;
     padding: 20px 0;
@@ -155,7 +160,7 @@
   }
 
   &-votes {
-    border-top: 1px solid $border-color;
+    border-top: 1px solid $low-contrast-border-color;
     padding: 30px 0;
     text-align: center;
   }
@@ -177,7 +182,7 @@
       display: none;
     }
 
-    border-top: 1px solid $border-color;
+    border-top: 1px solid $high-contrast-border-color;
 
     a {
       color: $text_color;
@@ -224,6 +229,8 @@
     display: block;
     margin-top: 10px;
     margin-bottom: 16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
