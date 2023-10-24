@@ -7,10 +7,12 @@
 
   function toggleNavigation(toggle, menu) {
     const isExpanded = menu.getAttribute("aria-expanded") === "true";
+    menu.setAttribute("aria-expanded", !isExpanded);
     toggle.setAttribute("aria-expanded", !isExpanded);
   }
 
-  function closeNavigation(toggle) {
+  function closeNavigation(toggle, menu) {
+    menu.setAttribute("aria-expanded", false);
     toggle.setAttribute("aria-expanded", false);
     toggle.focus();
   }
@@ -29,7 +31,7 @@
     menuList.addEventListener("keyup", (event) => {
       if (event.keyCode === ESCAPE) {
         event.stopPropagation();
-        closeNavigation(menuButton);
+        closeNavigation(menuButton, menuList);
       }
     });
 
@@ -50,7 +52,7 @@
       element.addEventListener("keyup", (event) => {
         console.log("escape");
         if (event.keyCode === ESCAPE) {
-          closeNavigation(toggle);
+          closeNavigation(toggle, element);
         }
       });
     });
@@ -637,6 +639,11 @@
     if (requestOrganisationSelect) {
       requestOrganisationSelect.addEventListener("change", () => {
         requestOrganisationSelect.form.submit();
+      });
+
+      requestOrganisationSelect.addEventListener("click", (e) => {
+        // Prevents Ticket details collapsible-sidebar to close on mobile
+        e.stopPropagation();
       });
     }
 
