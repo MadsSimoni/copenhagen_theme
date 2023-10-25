@@ -2,7 +2,7 @@
   <div class="footer-inner">
     {{#link 'help_center'}}{{help_center.name}}{{/link}}
     <a href="https://www.was.digst.dk/personregistrering-dk" title="Læs vores tilgængelighedserklæring (Åbner i nyt vindue)" target="_blank">Tilgængelighedserklæring</a>
-    <a href="https://personregistrering.zendesk.com/hc/da/articles/4415840807314" target="_blank">Kontaktoplysninger</a>
+    <a href="https://personregistrering.zendesk.com/hc/da/articles/4415840807314" target="_blank">{{dc 'contact_information'}}</a>
     <div class="footer-language-selector">
       {{#if alternative_locales}}
         <div class="dropdown language-selector">
@@ -21,12 +21,12 @@
           </span>
         </div>
       {{/if}}
-      {{#if signed_in}}
+      <!--{{#if signed_in}}
         {{else}}
             {{#link "sign_in"}}
             {{t 'sign_in'}}
         {{/link}}
-      {{/if}}
+      {{/if}}-->
     </div>
   </div>
 </footer>

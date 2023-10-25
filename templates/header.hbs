@@ -14,8 +14,26 @@
   <div class="nav-wrapper-desktop">
     <nav class="user-nav" id="user-nav" aria-label="{{t 'user_navigation'}}">
       <ul class="user-nav-list">
-        <li>{{link 'community'}}</li>
-        <li><a href="https://personregistrering.zendesk.com/hc/da/articles/360022110219" role="article" alt="Læs omkring personforum">Om personregistrering.dk</a></li>
+        <li><a href="https://personregistrering.zendesk.com/hc/da/articles/360022110219" role="article">{{dc 'about_reg'}}</a></li>
+        {{#if alternative_locales}}
+          <li>
+            <div class="dropdown language-selector">
+              <button class="dropdown-toggle" aria-haspopup="true">
+                {{current_locale.name}}
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" focusable="false" viewBox="0 0 12 12" class="dropdown-chevron-icon">
+                  <path fill="none" stroke="currentColor" stroke-linecap="round" d="M3 4.5l2.6 2.6c.2.2.5.2.7 0L9 4.5"/>
+                </svg>
+              </button>
+              <span class="dropdown-menu dropdown-menu-end" role="menu">
+                {{#each alternative_locales}}
+                  <a href="{{url}}" dir="{{direction}}" rel="nofollow" role="menuitem">
+                    {{name}}
+                  </a>
+                {{/each}}
+              </span>
+            </div>
+          </li>
+        {{/if}}
     <!--<li>{{link 'new_request' class='submit-a-request'}}</li>-->
     <!--{{#unless signed_in}}
           <li>
@@ -78,7 +96,7 @@
           <li class="nav-divider"></li>
         {{else}}
           <li class="item">
-            <a href="https://intranet.kirkenettet.dk">Login på Kirkenettet</a>
+            <a href="https://personregistrering.zendesk.com/hc/da/articles/360022110219" role="menuitem">{{dc 'about_reg'}}</a>
             <!--{{#link "sign_in" role="menuitem"}}
               {{t 'sign_in'}}
             {{/link}}-->
