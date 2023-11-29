@@ -15,14 +15,14 @@
       <ul class="user-nav-list">
         <li>{{link 'community'}}</li>
         <a href="https://folkekirkensintranet.dk">Gå til Folkekirkens IntraNet</a>
-        <!--<li>{{link 'new_request' class='submit-a-request'}}</li>-->
-        <!--{{#unless signed_in}}
+        <li>{{link 'new_request' class='submit-a-request'}}</li>
+        {{#unless signed_in}}
           <li>
             {{#link "sign_in" class="sign-in"}}
               {{t 'sign_in'}}
             {{/link}}
           </li>
-        {{/unless}}-->
+        {{/unless}}
       </ul>
     </nav>
     {{#if signed_in}}
@@ -78,14 +78,14 @@
         {{else}}
           <li class="item">
             <a href="https://intranet.kirkenettet.dk">Login på Kirkenettet</a>
-            <!--{{#link "sign_in" role="menuitem"}}
+            {{#link "sign_in" role="menuitem"}}
               {{t 'sign_in'}}
-            {{/link}}-->
+            {{/link}}
           </li>
           <li class="nav-divider"></li>
         {{/if}}
         <li class="item">{{link 'community' role="menuitem"}}</li>
-        <!--<li class="item">{{link 'new_request' role="menuitem" class='submit-a-request'}}</li>-->
+        <li class="item">{{link 'new_request' role="menuitem" class='submit-a-request'}}</li>
         <li class="nav-divider"></li>
         {{#if signed_in}}
           <li class="item">
