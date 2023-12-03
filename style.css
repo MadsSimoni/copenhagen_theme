@@ -498,7 +498,7 @@ ul {
 .table td {
   display: block;
 }
-.article-body table {
+.article-body table td {
   border: 1px solid $text_color;
 }
 @media (min-width: 768px) {
