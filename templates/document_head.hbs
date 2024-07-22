@@ -3,3 +3,22 @@
 <!-- See buildClearSearchButton() in script.js -->
 <script type="text/javascript">window.searchClearButtonLabelLocalized = "{{t 'search_clear'}}";</script>
 <meta name="google-site-verification" content="0k4M6xktrctQ2BdeQzhfN1-L-QoFfzS65UOHeJDc3Sc" />
+<script type="importmap">
+{
+  "imports": {
+    "new-request-form": "{{asset 'new-request-form-bundle.js'}}",
+    "flash-notifications": "{{asset 'flash-notifications-bundle.js'}}",
+    "new-request-form-translations": "{{asset 'new-request-form-translations-bundle.js'}}",
+    "shared": "{{asset 'shared-bundle.js'}}",
+    "wysiwyg": "{{asset 'wysiwyg-bundle.js'}}"
+  }
+}
+</script>
+<script type="module">
+  import { renderFlashNotifications } from "flash-notifications";
+
+  const settings = {{json settings}};
+  const closeLabel = {{json (t 'close')}}
+
+  renderFlashNotifications(settings, closeLabel);
+</script>
