@@ -3,17 +3,21 @@
  * This script is used for downloading the latest Zendesk official translation files for the modules in the `src/module` folder.
  *
  */
-import { writeFile } from "node:fs/promises";
+import { writeFile, readFile, mkdir } from "node:fs/promises";
 import { resolve } from "node:path";
-
-/**
- *  Maps each folder in the `src/modules` directory with its package name on the translation system
- */
-const MODULES = {
-  "new-request-form": "new-request-form",
-};
+import { glob } from "glob";
+import { load } from "js-yaml";
+import { parseArgs } from "node:util";
 
 const BASE_URL = `https://static.zdassets.com/translations`;
+
+const { values: args } = parseArgs({
+  options: {
+    module: {
+      type: "string",
+    },
+  },
+});
 
 async function writeLocaleFile(name, filePath, outputDir) {
   const response = await fetch(`${BASE_URL}${filePath}`);
@@ -38,6 +42,8 @@ async function fetchModuleTranslations(moduleName, packageName) {
       `src/modules/${moduleName}/translations/locales`
     );
 
+    await mkdir(outputDir, { recursive: true });
+
     const { json } = await manifestResponse.json();
 
     await Promise.all(
@@ -50,6 +56,26 @@ async function fetchModuleTranslations(moduleName, packageName) {
   }
 }
 
-for (const [moduleName, packageName] of Object.entries(MODULES)) {
+// search for `src/modules/**/translations/en-us.yml` files, read it contents and return a map of module names and package names
+async function getModules() {
+  const result = {};
+  const sourceFilesGlob = args.module
+    ? `src/modules/${args.module}/translations/en-us.yml`
+    : "src/modules/**/translations/en-us.yml";
+  const files = await glob(sourceFilesGlob);
+
+  for (const file of files) {
+    const content = await readFile(file);
+    const parsedContent = load(content);
+    const moduleName = file.split("/")[2];
+    result[moduleName] = parsedContent.packages[0];
+  }
+
+  return result;
+}
+
+const modules = await getModules();
+
+for (const [moduleName, packageName] of Object.entries(modules)) {
   await fetchModuleTranslations(moduleName, packageName);
 }

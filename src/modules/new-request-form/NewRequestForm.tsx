@@ -1,5 +1,5 @@
 import type { AnswerBot, Field, RequestForm } from "./data-types";
-import { useState } from "react";
+import { Fragment, useCallback, useState } from "react";
 import { Input } from "./fields/Input";
 import { TextArea } from "./fields/textarea/TextArea";
 import { DropDown } from "./fields/DropDown";
@@ -13,7 +13,7 @@ import { Alert } from "@zendeskgarden/react-notifications";
 import { useFormSubmit } from "./useFormSubmit";
 import { usePrefilledTicketFields } from "./usePrefilledTicketFields";
 import { Attachments } from "./fields/attachments/Attachments";
-import { useEndUserConditions } from "./useEndUserConditions";
+import { getVisibleFields } from "./getVisibleFields";
 import { DatePicker } from "./fields/DatePicker";
 import { CcField } from "./fields/cc-field/CcField";
 import { CreditCard } from "./fields/CreditCard";
@@ -22,6 +22,8 @@ import { SuggestedArticles } from "./suggested-articles/SuggestedArticles";
 import { AnswerBotModal } from "./answer-bot-modal/AnswerBotModal";
 import { useTranslation } from "react-i18next";
 import { Paragraph } from "@zendeskgarden/react-typography";
+import { LookupField } from "./fields/LookupField";
+import type { Organization } from "./data-types/Organization";
 
 export interface NewRequestFormProps {
   requestForm: RequestForm;
@@ -33,7 +35,9 @@ export interface NewRequestFormProps {
   baseLocale: string;
   hasAtMentions: boolean;
   userRole: string;
+  userId: number;
   brandId: number;
+  organizations: Array<Organization>;
   answerBotModal: {
     answerBot: AnswerBot;
     hasRequestManagement: boolean;
@@ -68,7 +72,9 @@ export function NewRequestForm({
   baseLocale,
   hasAtMentions,
   userRole,
+  userId,
   brandId,
+  organizations,
   answerBotModal,
 }: NewRequestFormProps) {
   const {
@@ -102,25 +108,31 @@ export function NewRequestForm({
     organizationField: organization_field,
     dueDateField: due_date_field,
   });
-
   const [ticketFields, setTicketFields] = useState(prefilledTicketFields);
   const [organizationField, setOrganizationField] = useState(
     prefilledOrganizationField
   );
   const [dueDateField, setDueDateField] = useState(prefilledDueDateField);
-  const visibleFields = useEndUserConditions(ticketFields, end_user_conditions);
+  const visibleFields = getVisibleFields(ticketFields, end_user_conditions);
   const { formRefCallback, handleSubmit } = useFormSubmit(ticketFields);
   const { t } = useTranslation();
+  const defaultOrganizationId =
+    organizations.length > 0 && organizations[0]?.id
+      ? organizations[0]?.id?.toString()
+      : null;
 
-  function handleChange(field: Field, value: Field["value"]) {
-    setTicketFields(
-      ticketFields.map((ticketField) =>
-        ticketField.name === field.name
-          ? { ...ticketField, value }
-          : ticketField
-      )
-    );
-  }
+  const handleChange = useCallback(
+    (field: Field, value: Field["value"]) => {
+      setTicketFields(
+        ticketFields.map((ticketField) =>
+          ticketField.name === field.name
+            ? { ...ticketField, value }
+            : ticketField
+        )
+      );
+    },
+    [ticketFields]
+  );
 
   function handleOrganizationChange(value: string) {
     if (organizationField === null) {
@@ -130,13 +142,16 @@ export function NewRequestForm({
     setOrganizationField({ ...organizationField, value });
   }
 
-  function handleDueDateChange(value: string) {
-    if (dueDateField === null) {
-      return;
-    }
+  const handleDueDateChange = useCallback(
+    (value: string) => {
+      if (dueDateField === null) {
+        return;
+      }
 
-    setDueDateField({ ...dueDateField, value });
-  }
+      setDueDateField({ ...dueDateField, value });
+    },
+    [dueDateField]
+  );
 
   return (
     <>
@@ -190,9 +205,8 @@ export function NewRequestForm({
           switch (field.type) {
             case "subject":
               return (
-                <>
+                <Fragment key={field.name}>
                   <Input
-                    key={field.name}
                     field={field}
                     onChange={(value) => handleChange(field, value)}
                   />
@@ -200,7 +214,7 @@ export function NewRequestForm({
                     query={field.value as string | undefined}
                     locale={locale}
                   />
-                </>
+                </Fragment>
               );
             case "text":
             case "integer":
@@ -216,15 +230,15 @@ export function NewRequestForm({
             case "partialcreditcard":
               return (
                 <CreditCard
+                  key={field.name}
                   field={field}
                   onChange={(value) => handleChange(field, value)}
                 />
               );
             case "description":
               return (
-                <>
+                <Fragment key={field.name}>
                   <TextArea
-                    key={field.name}
                     field={field}
                     hasWysiwyg={wysiwyg}
                     baseLocale={baseLocale}
@@ -238,7 +252,7 @@ export function NewRequestForm({
                     name={description_mimetype_field.name}
                     value={wysiwyg ? "text/html" : "text/plain"}
                   />
-                </>
+                </Fragment>
               );
             case "textarea":
               return (
@@ -257,9 +271,8 @@ export function NewRequestForm({
             case "basic_priority":
             case "tickettype":
               return (
-                <>
+                <Fragment key={field.name}>
                   <DropDown
-                    key={field.name}
                     field={field}
                     onChange={(value) => handleChange(field, value)}
                   />
@@ -273,11 +286,12 @@ export function NewRequestForm({
                       }}
                     />
                   )}
-                </>
+                </Fragment>
               );
             case "checkbox":
               return (
                 <Checkbox
+                  key={field.name}
                   field={field}
                   onChange={(value: boolean) => handleChange(field, value)}
                 />
@@ -285,6 +299,7 @@ export function NewRequestForm({
             case "date":
               return (
                 <DatePicker
+                  key={field.name}
                   field={field}
                   locale={baseLocale}
                   valueFormat="date"
@@ -292,7 +307,7 @@ export function NewRequestForm({
                 />
               );
             case "multiselect":
-              return <MultiSelect field={field} />;
+              return <MultiSelect key={field.name} field={field} />;
             case "tagger":
               return (
                 <Tagger
@@ -301,8 +316,23 @@ export function NewRequestForm({
                   onChange={(value) => handleChange(field, value)}
                 />
               );
+            case "lookup":
+              return (
+                <LookupField
+                  key={field.name}
+                  field={field}
+                  userId={userId}
+                  organizationId={
+                    organizationField !== null
+                      ? (organizationField.value as string)
+                      : defaultOrganizationId
+                  }
+                  onChange={(value) => handleChange(field, value)}
+                  visibleFields={visibleFields}
+                />
+              );
             default:
-              return <></>;
+              return <Fragment key={field.name}></Fragment>;
           }
         })}
         {attachments_field && <Attachments field={attachments_field} />}

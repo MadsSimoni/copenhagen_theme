@@ -6,6 +6,7 @@
 # If you are building your own theme, you can remove this file and just load the translation JSON files, or provide
 # your translations with a different method.
 #
+
 title: "Copenhagen Theme New Request Form"
 packages:
   - "new-request-form"
@@ -97,10 +98,25 @@ parts:
       screenshot: "https://drive.google.com/file/d/1JFVE2twzUkg-U6gGAs2EHqD-3jPvtJDA/view?usp=drive_link"
       value: "Remove file"
   - translation:
+      key: "new-request-form.attachments.stop-upload-aria-label"
+      title: "[A11Y] Hidden label for screen readers for stopping the upload of an attachment. {{fileName}} will be replaced by file name, e.g., [image.png]. Alternative English if you encounter declension issues: [Stop uploading the file {{fileName}}]"
+      screenshot: "https://drive.google.com/file/d/1Y6yeqp3fbfJbuq7tT8VutsLa80GZju-V/view?usp=drive_link"
+      value: "Stop uploading {{fileName}}"
+  - translation:
+      key: "new-request-form.attachments.remove-file-aria-label"
+      title: "[A11Y] Hidden label for screen readers for removing an attachment. {{fileName}} will be replaced by file name, e.g., [image.png]. Alternative English if you encounter declension issues: [Removing the file {{fileName}}]"
+      screenshot: "https://drive.google.com/file/d/1JFVE2twzUkg-U6gGAs2EHqD-3jPvtJDA/view?usp=drive_link"
+      value: "Remove file: {{fileName}}"
+  - translation:
       key: "new-request-form.attachments.uploading"
       title: "[A11Y] Hidden label for screen readers for the upload attachment progress bar. {{fileName}} will be replaced by file name, e.g., [image.png]. Alternative English if you encounter declension issues: [Uploading the file {{fileName}}]"
       screenshot: "https://drive.google.com/file/d/1Y6yeqp3fbfJbuq7tT8VutsLa80GZju-V/view?usp=drive_link"
       value: "Uploading {{fileName}}"
+  - translation:
+      key: "new-request-form.attachments.file"
+      title: "[A11Y] Hidden label for screen readers informing how they can remove the file with keyboard navigation. {{fileName}} will be replaced by file name, e.g., [image.png]. Alternative English if you encounter declension issues: [Press Delete to remove the file {{fileName}}]"
+      screenshot: "https://drive.google.com/file/d/1JFVE2twzUkg-U6gGAs2EHqD-3jPvtJDA/view?usp=drive_link"
+      value: "File: {{fileName}}, press delete to remove"
   - translation:
       key: "new-request-form.submit"
       title: "Submit button for the New Request Form"
@@ -156,3 +172,28 @@ parts:
       title: "Additional label shown above the credit card field, informing the user that only the last 4 digits are required."
       screenshot: "https://drive.google.com/file/d/13Pz2p5q7FHX9FKT6MUR6Sg5vWy55X0kP/view?usp=drive_link"
       value: "(Last 4 digits)"
+  - translation:
+      key: "new-request-form.lookup-field.loading-options"
+      title: "Message shown in combobox when searched options are loading"
+      screenshot: "https://drive.google.com/file/d/1_TeqU5hihEJb03q6adVI0-nuklYask1d/view?usp=drive_link"
+      value: "Loading items..."
+  - translation:
+      key: "new-request-form.lookup-field.no-matches-found"
+      title: "Message shown in combobox when searched option is not found"
+      screenshot: "https://drive.google.com/file/d/1zwRLhFj0I0N0JV07O7wpoEZO5tBBK8JF/view?usp=drive_link"
+      value: "No matches found"
+  - translation:
+      key: "new-request-form.lookup-field.placeholder"
+      title: "Placeholder shown in combobox, {{label}} will be replaced by field label"
+      screenshot: "https://drive.google.com/file/d/1nlnj_I-L7bkIs9Hn93Btrl8bh_HJfL6h/view?usp=drive_link"
+      value: "Search {{label}}"
+  - translation:
+      key: "new-request-form.attachments.upload-failed-title"
+      title: "Title of the notification shown when the upload of an attachment failed"
+      screenshot: "https://drive.google.com/file/d/1HaYFIjlr89IWfu-HweJbTRjC23u3bLP-/view?usp=sharing"
+      value: "{{fileName}} upload failed"
+  - translation:
+      key: "new-request-form.attachments.error-separator"
+      title: "Separator between errors for the same file - please localize according to your language's punctuation rules"
+      screenshot: "https://drive.google.com/file/d/1z8VM5w7BLz9E5iJlAzX1mVuvv9Jz0XGL/view?usp=sharing"
+      value: "; "

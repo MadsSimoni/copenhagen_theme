@@ -4,6 +4,7 @@ import {
   Input,
   Label,
   Message,
+  FileList,
 } from "@zendeskgarden/react-forms";
 import {
   Close,
@@ -60,22 +61,55 @@ export function Attachments({ field }: AttachmentProps): JSX.Element {
   const { addToast } = useToast();
   const { t } = useTranslation();
 
+  const convertError = (file: File, xhr: XMLHttpRequest) => {
+    if (
+      xhr.response?.error == "RecordInvalid" &&
+      !!xhr.response?.details?.base
+    ) {
+      const errorMessage = xhr.response?.details?.base
+        ?.map((errorString) => errorString?.description)
+        .join(t("new-request-form.attachments.error-separator", "; "));
+      return {
+        title: uploadFailedTitle(file),
+        errorMessage,
+      };
+    } else if (
+      xhr.response?.error == "AttachmentFilenameTooLong" ||
+      xhr.response?.error == "AttachmentTooLarge"
+    ) {
+      return {
+        title: uploadFailedTitle(file),
+        errorMessage: xhr.response?.description,
+      };
+    } else {
+      return {
+        title: t(
+          "new-request-form.attachments.upload-error-title",
+          "Upload error"
+        ),
+        errorMessage: t(
+          "new-request-form.attachments.upload-error-description",
+          "There was an error uploading {{fileName}}. Try again or upload another file.",
+          { fileName: file.name }
+        ),
+      };
+    }
+  };
+
+  const uploadFailedTitle = (file: File) => {
+    return t(
+      "new-request-form.attachments.upload-failed-title",
+      "Upload failed",
+      { fileName: file.name }
+    );
+  };
+
   const notifyError = useCallback(
-    (fileName: string) => {
+    (title: string, errorMessage: string) => {
       addToast(({ close }) => (
         <Notification type="error">
-          <Title>
-            {t(
-              "new-request-form.attachments.upload-error-title",
-              "Upload error"
-            )}
-          </Title>
-          {t(
-            "new-request-form.attachments.upload-error-description",
-            "There was an error uploading {{fileName}}. Try again or upload another file.",
-            { fileName }
-          )}
-
+          <Title>{title}</Title>
+          {errorMessage}
           <Close
             aria-label={t("new-request-form.close-label", "Close")}
             onClick={close}
@@ -97,7 +131,14 @@ export function Attachments({ field }: AttachmentProps): JSX.Element {
         url.searchParams.append("filename", file.name);
         xhr.open("POST", url);
 
-        xhr.setRequestHeader("Content-Type", file.type);
+        // If the browser returns a type for the file, use it as the Content-Type header,
+        // otherwise we fall back to application/octet-stream and let the backend
+        // determine the file type.
+        if (file.type) {
+          xhr.setRequestHeader("Content-Type", file.type);
+        } else {
+          xhr.setRequestHeader("Content-Type", "application/octet-stream");
+        }
         xhr.setRequestHeader("X-CSRF-Token", csrfToken);
         xhr.responseType = "json";
 
@@ -126,13 +167,15 @@ export function Attachments({ field }: AttachmentProps): JSX.Element {
             } = xhr.response as UploadFileResponse;
             setUploaded(pendingId, { id: token, file_name, url: content_url });
           } else {
-            notifyError(file.name);
+            const { title, errorMessage } = convertError(file, xhr);
+            notifyError(title, errorMessage);
             removePendingFile(pendingId);
           }
         });
 
         xhr.addEventListener("error", () => {
-          notifyError(file.name);
+          const { title, errorMessage } = convertError(file, xhr);
+          notifyError(title, errorMessage);
           removePendingFile(pendingId);
         });
 
@@ -189,15 +232,17 @@ export function Attachments({ field }: AttachmentProps): JSX.Element {
         )}
         <Input {...getInputProps()} />
       </FileUpload>
-      {files.map((file) => (
-        <FileListItem
-          key={file.status === "pending" ? file.id : file.value.id}
-          file={file}
-          onRemove={() => {
-            handleRemove(file);
-          }}
-        />
-      ))}
+      <FileList>
+        {files.map((file) => (
+          <FileListItem
+            key={file.status === "pending" ? file.id : file.value.id}
+            file={file}
+            onRemove={() => {
+              handleRemove(file);
+            }}
+          />
+        ))}
+      </FileList>
       {files.map(
         (file) =>
           file.status === "uploaded" && (
