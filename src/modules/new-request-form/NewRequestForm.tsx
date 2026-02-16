@@ -1,4 +1,8 @@
-import type { AnswerBot, RequestForm } from "./data-types";
+import type {
+  AnswerBot,
+  AnswerBotGenerativeExperience,
+  RequestForm,
+} from "./data-types";
 import { Fragment, useCallback, useState } from "react";
 import { TicketFormField } from "./ticket-form-field/TicketFormField";
 import { ParentTicketField } from "./parent-ticket-field/ParentTicketField";
@@ -7,7 +11,7 @@ import styled from "styled-components";
 import { Alert } from "@zendeskgarden/react-notifications";
 import { useFormSubmit } from "./useFormSubmit";
 import { usePrefilledTicketFields } from "./usePrefilledTicketFields";
-import { Attachments } from "./fields/attachments/Attachments";
+import { Attachments } from "../ticket-fields/fields/attachments/Attachments";
 import { getVisibleFields } from "../ticket-fields/getVisibleFields";
 import { CcField } from "./fields/cc-field/CcField";
 import { SuggestedArticles } from "./suggested-articles/SuggestedArticles";
@@ -17,6 +21,7 @@ import { Paragraph } from "@zendeskgarden/react-typography";
 import { DropDown, Input, TextArea, RequestFormField } from "../ticket-fields";
 import type { Organization } from "../ticket-fields/data-types/Organization";
 import type { TicketFieldObject } from "../ticket-fields/data-types/TicketFieldObject";
+import { GenerativeAnswerBotModal } from "./answer-bot-generative-modal/GenerativeAnswerBotModal";
 
 export interface NewRequestFormProps {
   requestForm: RequestForm;
@@ -32,7 +37,8 @@ export interface NewRequestFormProps {
   brandId: number;
   organizations: Array<Organization>;
   answerBotModal: {
-    answerBot: AnswerBot;
+    answerBot: AnswerBot | null;
+    answerBotGenerativeExperience: AnswerBotGenerativeExperience | null;
     hasRequestManagement: boolean;
     isSignedIn: boolean;
     helpCenterPath: string;
@@ -87,7 +93,7 @@ export function NewRequestForm({
     inline_attachments_fields,
     description_mimetype_field,
   } = requestForm;
-  const { answerBot } = answerBotModal;
+  const { answerBot, answerBotGenerativeExperience } = answerBotModal;
   const {
     ticketFields: prefilledTicketFields,
     emailField,
@@ -145,6 +151,16 @@ export function NewRequestForm({
     },
     [dueDateField]
   );
+
+  const answerBotModalEnabled =
+    !!answerBot?.auth_token &&
+    !!answerBot?.interaction_access_token &&
+    !!answerBot?.articles?.length &&
+    !!answerBot?.request_id;
+
+  const answerBotGenerativeModalEnabled =
+    answerBotGenerativeExperience &&
+    Boolean(answerBotGenerativeExperience.request_id);
 
   return (
     <>
@@ -262,18 +278,21 @@ export function NewRequestForm({
           )}
         </Footer>
       </Form>
-      {answerBot.auth_token &&
-        answerBot.interaction_access_token &&
-        answerBot.articles.length > 0 &&
-        answerBot.request_id && (
-          <AnswerBotModal
-            authToken={answerBot.auth_token}
-            interactionAccessToken={answerBot.interaction_access_token}
-            articles={answerBot.articles}
-            requestId={answerBot.request_id}
-            {...answerBotModal}
-          />
-        )}
+      {answerBotModalEnabled && (
+        <AnswerBotModal
+          authToken={answerBot.auth_token!}
+          interactionAccessToken={answerBot.interaction_access_token!}
+          articles={answerBot.articles!}
+          requestId={answerBot.request_id!}
+          {...answerBotModal}
+        />
+      )}
+      {answerBotGenerativeModalEnabled && (
+        <GenerativeAnswerBotModal
+          requestId={Number(answerBotGenerativeExperience.request_id)}
+          {...answerBotModal}
+        />
+      )}
     </>
   );
 }

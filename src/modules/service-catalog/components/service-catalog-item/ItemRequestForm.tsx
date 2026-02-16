@@ -1,14 +1,26 @@
 import styled from "styled-components";
-import { useEffect, useState } from "react";
+import { Fragment, useCallback, useState } from "react";
 import { RequestFormField } from "../../../ticket-fields";
 import { Button } from "@zendeskgarden/react-buttons";
-import { getColorV8 } from "@zendeskgarden/react-theming";
+import { getColor } from "@zendeskgarden/react-theming";
 import { useTranslation } from "react-i18next";
 import type { ServiceCatalogItem } from "../../data-types/ServiceCatalogItem";
 import { CollapsibleDescription } from "./CollapsibleDescription";
 import type { TicketFieldObject } from "../../../ticket-fields/data-types/TicketFieldObject";
 import type { CustomObjectRecord } from "../../../ticket-fields/data-types/CustomObjectRecord";
-import { useAssetDataFetchers } from "../../../service-catalog/hooks/useAssetDataFetchers";
+import type { ITAMAssetOptionObject } from "../../data-types/ITAMAssetOptionObject";
+import { Span } from "@zendeskgarden/react-typography";
+import { Option } from "@zendeskgarden/react-dropdowns";
+import { Attachments } from "../../../ticket-fields/fields/attachments/Attachments";
+import {
+  AttachmentsInputName,
+  ASSET_TYPE_KEY,
+  ASSET_KEY,
+} from "../../constants";
+import type {
+  AttachmentsError,
+  AttachmentsOption,
+} from "../../data-types/Attachments";
 
 const Form = styled.form`
   display: flex;
@@ -38,17 +50,18 @@ const ButtonWrapper = styled.div`
   margin-inline-start: ${(props) => props.theme.space.xl};
   padding: ${(props) => props.theme.space.lg};
   border: ${(props) => props.theme.borders.sm}
-    ${(props) => getColorV8("grey", 300, props.theme)};
+    ${({ theme }) => getColor({ theme, hue: "grey", shade: 300 })};
   height: fit-content;
 
   @media (max-width: ${(props) => props.theme.breakpoints.md}) {
     position: sticky;
     top: 0;
-    background: ${(props) => props.theme.colors.background};
+    background: ${({ theme }) =>
+      getColor({ theme, variable: "background.default" })};
     padding: ${(props) => props.theme.space.lg};
     border: none;
     border-top: ${(props) => props.theme.borders.sm}
-      ${(props) => getColorV8("grey", 300, props.theme)};
+      ${({ theme }) => getColor({ theme, hue: "grey", shade: 300 })};
     width: 100vw;
     margin-inline-start: 0;
   }
@@ -82,12 +95,6 @@ const LeftColumn = styled.div`
   }
 `;
 
-export const ASSET_TYPE_KEY = "zen:custom_object:standard::itam_asset_type";
-export const ASSET_KEY = "zen:custom_object:standard::itam_asset";
-
-type AssetTypeState = { ids: string[]; hidden: boolean; ready: boolean };
-type AssetState = { ids: string[]; ready: boolean };
-
 const isAssetField = (f: TicketFieldObject) =>
   f.relationship_target_type === ASSET_KEY;
 const isAssetTypeField = (f: TicketFieldObject) =>
@@ -107,6 +114,17 @@ interface ItemRequestFormProps {
     value: string | string[] | boolean | null
   ) => void;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  attachmentsOption: AttachmentsOption | undefined;
+  attachmentsRequiredError: AttachmentsError;
+  setAttachmentsRequiredError: (error: AttachmentsError) => void;
+  isRequestFieldsLoading: boolean;
+  isLoadingAttachmentsOption: boolean;
+  assetTypeError: string | null;
+  assetError: string | null;
+  assetTypeHiddenValue: string;
+  isAssetTypeHidden: boolean;
+  assetTypeIds: string[];
+  assetIds: string[];
 }
 
 export function ItemRequestForm({
@@ -120,97 +138,36 @@ export function ItemRequestForm({
   defaultOrganizationId,
   handleChange,
   onSubmit,
+  attachmentsOption,
+  attachmentsRequiredError,
+  setAttachmentsRequiredError,
+  isRequestFieldsLoading,
+  isLoadingAttachmentsOption,
+  assetTypeError,
+  assetError,
+  assetTypeHiddenValue,
+  isAssetTypeHidden,
+  assetTypeIds,
+  assetIds,
 }: ItemRequestFormProps) {
   const { t } = useTranslation();
 
-  const assetOptionId =
-    serviceCatalogItem?.custom_object_fields?.["standard::asset_option"];
-  const assetTypeOptionId =
-    serviceCatalogItem?.custom_object_fields?.["standard::asset_type_option"];
-
-  const { fetchAssets, fetchAssetTypes } = useAssetDataFetchers(
-    assetOptionId,
-    assetTypeOptionId
-  );
-
-  const [assetTypeState, setAssetTypeState] = useState<AssetTypeState>({
-    ids: [],
-    hidden: false,
-    ready: false,
-  });
-  const [assetState, setAssetState] = useState<AssetState>({
-    ids: [],
-    ready: false,
-  });
-  const [isHiddenAssetsType, setIsHiddenAssetsType] = useState(false);
-
-  const hiddenValue =
-    assetTypeState.hidden && assetTypeState.ids[0] ? assetTypeState.ids[0] : "";
-
-  useEffect(() => {
-    let alive = true;
-
-    const initAssets = async () => {
-      try {
-        const res = await fetchAssetTypes();
-        if (!alive) return;
-
-        const hidden = !!res?.isHiddenAssetsType;
-        const raw = res?.assetTypeIds;
-
-        let ids: string[] = [];
-
-        if (Array.isArray(raw)) {
-          ids = raw.map(String);
-        } else if (typeof raw === "string") {
-          ids = raw.split(",");
-        }
-
-        ids = ids.map((s) => s.trim()).filter(Boolean);
-
-        setAssetTypeState({ ids, hidden, ready: true });
-        setIsHiddenAssetsType(hidden);
-      } catch (e) {
-        if (!alive) return;
-        setAssetTypeState({ ids: [], hidden: false, ready: true });
-      }
-
-      try {
-        const idsStr = await fetchAssets();
-        if (!alive) return;
-
-        let ids: string[] = [];
-
-        if (typeof idsStr === "string") {
-          ids = idsStr.split(",");
-        } else if (Array.isArray(idsStr)) {
-          ids = idsStr.map(String);
-        }
-
-        ids = ids.map((s) => s.trim()).filter(Boolean);
-
-        setAssetState({ ids, ready: true });
-      } catch (e) {
-        if (!alive) return;
-        setAssetState({ ids: [], ready: true });
-      }
-    };
-
-    initAssets();
-
-    return () => {
-      alive = false;
-    };
-  }, [fetchAssetTypes, fetchAssets, handleChange]);
+  const [isUploadingAttachments, setIsUploadingAttachments] = useState(false);
 
   const buildLookupFieldOptions = async (
     records: CustomObjectRecord[],
     field: TicketFieldObject
-  ) => {
+  ): Promise<ITAMAssetOptionObject[]> => {
     if (!Array.isArray(records) || records.length === 0) return [];
 
-    const options = records.map((rec) => {
-      const base = { name: rec.name, value: rec.id };
+    const options: ITAMAssetOptionObject[] = records.map((rec) => {
+      const base = {
+        name: rec.name,
+        value: rec.id,
+        serialNumber: rec.custom_object_fields["standard::serial_number"] as
+          | string
+          | undefined,
+      };
 
       if (rec.custom_object_key === "standard::itam_asset") {
         const fields = (rec.custom_object_fields ?? {}) as {
@@ -225,25 +182,143 @@ export function ItemRequestForm({
     });
 
     if (isAssetTypeField(field)) {
-      if (assetTypeState.hidden) return [];
-      if (!assetTypeState.ids?.length) return [];
-      return options.filter((o) => assetTypeState.ids.includes(o.value));
+      if (isAssetTypeHidden) return [];
+      if (!assetTypeIds?.length) return [];
+      return options.filter((o) => assetTypeIds.includes(o.value));
     }
 
     if (isAssetField(field)) {
       let list = options;
-
-      if (assetTypeState.ids?.length) {
+      if (assetIds?.length) {
         list = list.filter((o) =>
-          assetTypeState.ids.includes(o.item_asset_type_id ?? "")
+          assetIds.includes(o.item_asset_type_id ?? "")
         );
-      }
-      if (assetState.ids?.length) {
-        list = list.filter((o) => assetState.ids.includes(o.value));
       }
       return list;
     }
-    return options.map(({ name, value }) => ({ name, value }));
+    return options.map(({ name, value, serialNumber }) => ({
+      name,
+      value,
+      serialNumber,
+    }));
+  };
+
+  const renderLookupFieldOption = (option: ITAMAssetOptionObject) => {
+    if (option.serialNumber) {
+      return (
+        <>
+          {option.name}
+          <Option.Meta>
+            <Span hue="grey">
+              {t(
+                "service-catalog.item.serial-number-label",
+                "SN: {{serialNumber}}",
+                { serialNumber: option.serialNumber }
+              )}
+            </Span>
+          </Option.Meta>
+        </>
+      );
+    }
+    return option.name;
+  };
+
+  const handleAttachmentsOnUpload = useCallback(
+    (status: boolean) => {
+      setAttachmentsRequiredError(null);
+      setIsUploadingAttachments(status);
+    },
+    [setAttachmentsRequiredError, setIsUploadingAttachments]
+  );
+
+  const renderRequestFields = () => {
+    if (isRequestFieldsLoading || isLoadingAttachmentsOption) {
+      return null;
+    }
+
+    const attachmentsPosition =
+      attachmentsOption?.custom_object_fields?.["standard::position_in_portal"];
+
+    const attachmentsElement = attachmentsOption ? (
+      <Attachments
+        key="attachments"
+        field={{
+          name: AttachmentsInputName,
+          label: attachmentsOption.name,
+          description:
+            attachmentsOption.custom_object_fields["standard::description"] ??
+            "",
+          error: attachmentsRequiredError,
+          attachments: [],
+          isRequired:
+            attachmentsOption.custom_object_fields["standard::is_required"] ??
+            false,
+        }}
+        baseLocale={baseLocale}
+        onUploadingChange={handleAttachmentsOnUpload}
+      />
+    ) : null;
+
+    const elements: React.ReactNode[] = [];
+
+    requestFields.forEach((field, index) => {
+      if (
+        attachmentsElement &&
+        typeof attachmentsPosition === "number" &&
+        index === attachmentsPosition
+      ) {
+        elements.push(attachmentsElement);
+      }
+
+      if (isAssetTypeField(field) && isAssetTypeHidden) {
+        elements.push(
+          <Fragment key={field.id}>
+            <input
+              type="hidden"
+              name={field.name}
+              value={assetTypeHiddenValue}
+            />
+            <input type="hidden" name="isAssetTypeHidden" value="true" />
+          </Fragment>
+        );
+        return;
+      }
+
+      const customField = {
+        ...field,
+        error: isAssetField(field)
+          ? assetError || field.error
+          : isAssetTypeField(field)
+          ? assetTypeError || field.error
+          : field.error,
+      };
+
+      elements.push(
+        <RequestFormField
+          key={field.id}
+          field={customField}
+          baseLocale={baseLocale}
+          hasAtMentions={hasAtMentions}
+          userRole={userRole}
+          userId={userId}
+          brandId={brandId}
+          defaultOrganizationId={defaultOrganizationId}
+          handleChange={handleChange}
+          visibleFields={requestFields}
+          buildLookupFieldOptions={buildLookupFieldOptions}
+          renderLookupFieldOption={renderLookupFieldOption}
+        />
+      );
+    });
+    if (
+      attachmentsElement &&
+      typeof attachmentsPosition === "number" &&
+      attachmentsPosition >= requestFields.length
+    ) {
+      elements.push(attachmentsElement);
+    }
+
+    return elements;
   };
 
   return (
@@ -254,37 +329,17 @@ export function ItemRequestForm({
           description={serviceCatalogItem.description}
           thumbnailUrl={serviceCatalogItem.thumbnail_url}
         />
-        <FieldsContainer>
-          {requestFields.map((field) => {
-            if (isAssetTypeField(field) && isHiddenAssetsType) {
-              return (
-                <>
-                  <input type="hidden" name={field.name} value={hiddenValue} />
-                  <input type="hidden" name="isAssetTypeHidden" value="true" />
-                </>
-              );
-            }
-            return (
-              <RequestFormField
-                key={field.id}
-                field={field}
-                baseLocale={baseLocale}
-                hasAtMentions={hasAtMentions}
-                userRole={userRole}
-                userId={userId}
-                brandId={brandId}
-                defaultOrganizationId={defaultOrganizationId}
-                handleChange={handleChange}
-                visibleFields={requestFields}
-                buildLookupFieldOptions={buildLookupFieldOptions}
-              />
-            );
-          })}
-        </FieldsContainer>
+        <FieldsContainer>{renderRequestFields()}</FieldsContainer>
       </LeftColumn>
       <RightColumn>
         <ButtonWrapper>
-          <Button isPrimary size="large" isStretched type="submit">
+          <Button
+            disabled={isUploadingAttachments}
+            isPrimary
+            size="large"
+            isStretched
+            type="submit"
+          >
             {t("service-catalog.item.submit-button", "Submit request")}
           </Button>
         </ButtonWrapper>

@@ -19,7 +19,7 @@
         <li>{{link 'new_request' class='submit-a-request'}}</li>
         {{#unless signed_in}}
           <li>
-            {{#link "sign_in" class="sign-in"}}
+            {{#link "sign_in" class="sign-in" role="link"}}
               {{t 'sign_in'}}
             {{/link}}
           </li>
@@ -28,7 +28,7 @@
     </nav>
     {{#if signed_in}}
       <div class="user-info dropdown">
-        <button class="dropdown-toggle" aria-haspopup="true">
+        <button class="dropdown-toggle" aria-haspopup="true" aria-expanded="false">
           {{user_avatar class="user-avatar"}}
           <span>
             {{user_name}}
@@ -81,7 +81,7 @@
         {{else}}
           <li class="item">
             <a href="https://folkekirkensintranet.dk">Gå til Folkekirkens IntraNet</a>
-            {{#link "sign_in"}}
+            {{#link "sign_in" role="link"}}
               {{t 'sign_in'}}
             {{/link}}
           </li>

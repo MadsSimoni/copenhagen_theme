@@ -1,3 +1,296 @@
+## [4.29.2](https://github.com/zendesk/copenhagen_theme/compare/v4.29.1...v4.29.2) (2026-02-11)
+
+
+### Bug Fixes
+
+* add additional if clause for subject fields ([cc02488](https://github.com/zendesk/copenhagen_theme/commit/cc02488c4708871a49d0effbaa061a5ca6beed99))
+
+## [4.29.1](https://github.com/zendesk/copenhagen_theme/compare/v4.29.0...v4.29.1) (2026-02-05)
+
+
+### Bug Fixes
+
+* check truthy alias for requester name display ([37c886a](https://github.com/zendesk/copenhagen_theme/commit/37c886a97f02e66b1b91bdd3395935c8a265b9ec))
+* show requester name when empty string alias ([e2642cc](https://github.com/zendesk/copenhagen_theme/commit/e2642cc46f4bed223c76af4a0adf7123f7bc8cca))
+
+# [4.29.0](https://github.com/zendesk/copenhagen_theme/compare/v4.28.0...v4.29.0) (2026-02-04)
+
+
+### Features
+
+* add required validation for Assets ([9b21de8](https://github.com/zendesk/copenhagen_theme/commit/9b21de842da80563d274e7d3ad746f7abd94073c))
+
+# [4.28.0](https://github.com/zendesk/copenhagen_theme/compare/v4.27.0...v4.28.0) (2026-02-03)
+
+
+### Features
+
+* update generative reply logic to use polling ([5c2df63](https://github.com/zendesk/copenhagen_theme/commit/5c2df638a1e78d06dab8a9d9bc05a5b95c91dcac))
+
+# [4.27.0](https://github.com/zendesk/copenhagen_theme/compare/v4.26.1...v4.27.0) (2026-02-02)
+
+
+### Bug Fixes
+
+* locale missing from custom statuses ([05027f6](https://github.com/zendesk/copenhagen_theme/commit/05027f6cb82b2d598c230f157afb8a475d838fca))
+* use same default sort applied to current list ([0e7751b](https://github.com/zendesk/copenhagen_theme/commit/0e7751bcc27f9be342c834f9e71839d9ed6635db))
+
+
+### Features
+
+* replace old request list with new ([d0c62a4](https://github.com/zendesk/copenhagen_theme/commit/d0c62a4631ce0ea3d5543fa90b0785ab97efd89a))
+
+## [4.26.1](https://github.com/zendesk/copenhagen_theme/compare/v4.26.0...v4.26.1) (2026-01-29)
+
+
+### Bug Fixes
+
+* updated new-request-form translation strings to add external link label ([6293e9a](https://github.com/zendesk/copenhagen_theme/commit/6293e9a717d4133675d16da031010c7044978c17)), closes [#734](https://github.com/zendesk/copenhagen_theme/issues/734)
+
+# [4.26.0](https://github.com/zendesk/copenhagen_theme/compare/v4.25.1...v4.26.0) (2026-01-29)
+
+
+### Bug Fixes
+
+* open suggested artcle in new tab ([4272045](https://github.com/zendesk/copenhagen_theme/commit/42720452bd696c5271f64e0cb8e325ba69b6cb29))
+* relabel a string to avoid leaf node issue ([20dd1a9](https://github.com/zendesk/copenhagen_theme/commit/20dd1a9ce01da833b8977792ce1e2dcf5408f92e))
+
+
+### Features
+
+* enable reusable attachment field and uploads in Service Catalog items ([f9b205e](https://github.com/zendesk/copenhagen_theme/commit/f9b205e74b7fe39c6346a278320163528009d121))
+
+## [4.25.1](https://github.com/zendesk/copenhagen_theme/compare/v4.25.0...v4.25.1) (2026-01-12)
+
+
+### Bug Fixes
+
+* add empty role ([749b6e9](https://github.com/zendesk/copenhagen_theme/commit/749b6e90028bc5bb9e5081bf1ecd717f94841fb4))
+* update role attribute for sign-in link ([d0cc4c7](https://github.com/zendesk/copenhagen_theme/commit/d0cc4c738d951c112056fc0575da9f90c8a74f85))
+* update role for mobile menu ([ac9d36f](https://github.com/zendesk/copenhagen_theme/commit/ac9d36ff0720e317a42c268f97a1414b05370f33))
+
+# [4.25.0](https://github.com/zendesk/copenhagen_theme/compare/v4.24.1...v4.25.0) (2026-01-08)
+
+
+### Features
+
+* add service catalog hero image with translations ([2077092](https://github.com/zendesk/copenhagen_theme/commit/2077092aaaba6bf5566a5b2c39e43c85d4db87f9))
+
+## [4.24.1](https://github.com/zendesk/copenhagen_theme/compare/v4.24.0...v4.24.1) (2026-01-07)
+
+
+### Bug Fixes
+
+* removed old resolution for @zendeskgarden/container-utilities ([3672c4f](https://github.com/zendesk/copenhagen_theme/commit/3672c4fddf76bff6df0ef6b4c011d3e207559865)), closes [#706](https://github.com/zendesk/copenhagen_theme/issues/706)
+
+# [4.24.0](https://github.com/zendesk/copenhagen_theme/compare/v4.23.5...v4.24.0) (2026-01-05)
+
+
+### Bug Fixes
+
+* improve answerBotGenerativeExperience null check ([938112f](https://github.com/zendesk/copenhagen_theme/commit/938112f8b3325ac01608fa2d50eba630cb90fafa))
+* simplify requestPath logic in new_request_page template ([ff86edf](https://github.com/zendesk/copenhagen_theme/commit/ff86edf4db850ff52eee7f1280bca8361ad2634a))
+
+
+### Features
+
+* added answerBotGenerativeExperience field ([8cd74e8](https://github.com/zendesk/copenhagen_theme/commit/8cd74e8701523de16b29932945c77d3d394bf151))
+
+## [4.23.5](https://github.com/zendesk/copenhagen_theme/compare/v4.23.4...v4.23.5) (2025-12-18)
+
+
+### Bug Fixes
+
+* remove normalize from primaryhue ([f3d2cfc](https://github.com/zendesk/copenhagen_theme/commit/f3d2cfc6b2c08ee5e09092e6789bfad7ef4b777e))
+
+## [4.23.4](https://github.com/zendesk/copenhagen_theme/compare/v4.23.3...v4.23.4) (2025-12-18)
+
+
+### Bug Fixes
+
+* update createTheme to include garden v9 color overrides ([162c1f6](https://github.com/zendesk/copenhagen_theme/commit/162c1f61eca468c5bfaecf22641659b3ea7a2d29))
+
+## [4.23.3](https://github.com/zendesk/copenhagen_theme/compare/v4.23.2...v4.23.3) (2025-12-15)
+
+
+### Bug Fixes
+
+* bring back capitalization for the lookap field  placeholder ([395c6aa](https://github.com/zendesk/copenhagen_theme/commit/395c6aa7b6ff3c68ef07efb7bc38bdff11827433))
+
+## [4.23.2](https://github.com/zendesk/copenhagen_theme/compare/v4.23.1...v4.23.2) (2025-12-12)
+
+
+### Bug Fixes
+
+* fixed rendering errors with custom theme colors ([29f6e90](https://github.com/zendesk/copenhagen_theme/commit/29f6e90e1949a3f9e37e637558af235d5f53bd99)), closes [#edc4c4](https://github.com/zendesk/copenhagen_theme/issues/edc4c4)
+
+## [4.23.1](https://github.com/zendesk/copenhagen_theme/compare/v4.23.0...v4.23.1) (2025-12-09)
+
+
+### Bug Fixes
+
+* (service-catalog)service catalog item is able to be saved with one required field missing ([2583838](https://github.com/zendesk/copenhagen_theme/commit/25838382fee4a1d439a4cedf1f0607090b5c4e41))
+
+# [4.23.0](https://github.com/zendesk/copenhagen_theme/compare/v4.22.0...v4.23.0) (2025-12-04)
+
+
+### Features
+
+* add approval request polling ([f8c9805](https://github.com/zendesk/copenhagen_theme/commit/f8c9805703a5718d2b2d3d9b181e5e79fb49dd0b))
+* post clarification comments and make stateful ([84ee762](https://github.com/zendesk/copenhagen_theme/commit/84ee762118513d316ff5fe498105363af25b5cdd))
+
+# [4.22.0](https://github.com/zendesk/copenhagen_theme/compare/v4.21.0...v4.22.0) (2025-12-03)
+
+
+### Features
+
+* updated CKEditor to the latest version and improved a11y ([0eda14d](https://github.com/zendesk/copenhagen_theme/commit/0eda14d5c920c8724bfef327292a65b5d1af56bd))
+
+# [4.21.0](https://github.com/zendesk/copenhagen_theme/compare/v4.20.0...v4.21.0) (2025-12-03)
+
+
+### Features
+
+* linkify description in service catalog fields description ([12b15aa](https://github.com/zendesk/copenhagen_theme/commit/12b15aa3edc6664424d5969dfce45718eb2ff9f4))
+
+# [4.20.0](https://github.com/zendesk/copenhagen_theme/compare/v4.19.0...v4.20.0) (2025-12-02)
+
+
+### Features
+
+* improve form controls border contrast for accessibility ([19ff9ec](https://github.com/zendesk/copenhagen_theme/commit/19ff9ec949d59464783f688e780f768a2e24d6b3))
+* update wysiwyg to improve form controls contrast ([68564cc](https://github.com/zendesk/copenhagen_theme/commit/68564cc05573aa65877b8c5638c7e3a34f4981d6))
+
+# [4.19.0](https://github.com/zendesk/copenhagen_theme/compare/v4.18.1...v4.19.0) (2025-12-01)
+
+
+### Features
+
+* sanitize ticket field descriptions in Service Catalog using DOMPurify ([85208b6](https://github.com/zendesk/copenhagen_theme/commit/85208b68e56ee75c63ca235e6630371681967e4b))
+* simplify the validation solution ([deab4f4](https://github.com/zendesk/copenhagen_theme/commit/deab4f4902c005651050c7d32d09ba277b07f800))
+
+## [4.18.1](https://github.com/zendesk/copenhagen_theme/compare/v4.18.0...v4.18.1) (2025-11-26)
+
+
+### Bug Fixes
+
+* fix a11y autogenerated IDs to not return undefined ([72a4d2f](https://github.com/zendesk/copenhagen_theme/commit/72a4d2ff4b3a6d23f9616c7804820b733eb0407f)), closes [#688](https://github.com/zendesk/copenhagen_theme/issues/688)
+
+# [4.18.0](https://github.com/zendesk/copenhagen_theme/compare/v4.17.0...v4.18.0) (2025-11-25)
+
+
+### Features
+
+* upgrade [@zendeskgarden](https://github.com/zendeskgarden) to 9.12.0 ([f476e38](https://github.com/zendesk/copenhagen_theme/commit/f476e387cbd18d2492c1b903c75c1cd11966af2a))
+
+# [4.17.0](https://github.com/zendesk/copenhagen_theme/compare/v4.16.0...v4.17.0) (2025-11-24)
+
+
+### Bug Fixes
+
+* feedback in CR ([bfe25ce](https://github.com/zendesk/copenhagen_theme/commit/bfe25ce4ee07aa3e1c049127f9eea3d4f5847301))
+
+
+### Features
+
+* add translation for serial number label ([dada4f9](https://github.com/zendesk/copenhagen_theme/commit/dada4f9d3b20745a0716406b13ca15d6824c2702))
+
+# [4.16.0](https://github.com/zendesk/copenhagen_theme/compare/v4.15.2...v4.16.0) (2025-11-20)
+
+
+### Bug Fixes
+
+* code review ([852fd2d](https://github.com/zendesk/copenhagen_theme/commit/852fd2dc2f1bb9fbff39d6c2eff383e4e98f2942))
+* eslint ([ce8c25d](https://github.com/zendesk/copenhagen_theme/commit/ce8c25df3f0ade49246a681e5f0262764a408422))
+* feedback in CR ([85bd8d0](https://github.com/zendesk/copenhagen_theme/commit/85bd8d04d8212400dad68be03302b05c247837ae))
+
+
+### Features
+
+* add serial number to option in lookupfield ([1f459c3](https://github.com/zendesk/copenhagen_theme/commit/1f459c364349e50aea40547c49a32d1ceed71f28))
+
+## [4.15.2](https://github.com/zendesk/copenhagen_theme/compare/v4.15.1...v4.15.2) (2025-11-20)
+
+
+### Bug Fixes
+
+* label should be taken from asset api ([6982b49](https://github.com/zendesk/copenhagen_theme/commit/6982b497fc0e6d2cbb54caaae0446d4c5869d3a1))
+
+## [4.15.1](https://github.com/zendesk/copenhagen_theme/compare/v4.15.0...v4.15.1) (2025-11-19)
+
+
+### Bug Fixes
+
+* **attachments:** enable keyboard navigation with Enter/Space in attachments field ([d447cb8](https://github.com/zendesk/copenhagen_theme/commit/d447cb842c61b32c07f90a0e9c42656093f38917))
+* **attachments:** removed refs ([9faaef9](https://github.com/zendesk/copenhagen_theme/commit/9faaef97c4272516d36cd82988dc9a758bc8f8b0))
+
+# [4.15.0](https://github.com/zendesk/copenhagen_theme/compare/v4.14.1...v4.15.0) (2025-11-19)
+
+
+### Bug Fixes
+
+* eslint ([428d305](https://github.com/zendesk/copenhagen_theme/commit/428d305b7926dde5fa3a972165029307ec4ee56a))
+* feedback in CR ([f8323fc](https://github.com/zendesk/copenhagen_theme/commit/f8323fcd7aceaebb40451e91465d9bb99c3eea84))
+* tests ([0336c3a](https://github.com/zendesk/copenhagen_theme/commit/0336c3aa2251f82b9f9c14b410e659c53f9b8d58))
+
+
+### Features
+
+* show description from API ([d3dc29a](https://github.com/zendesk/copenhagen_theme/commit/d3dc29ab2955c19fec80928fea9ee649d6ca0754))
+
+## [4.14.1](https://github.com/zendesk/copenhagen_theme/compare/v4.14.0...v4.14.1) (2025-11-18)
+
+
+### Bug Fixes
+
+* another test ([8e43727](https://github.com/zendesk/copenhagen_theme/commit/8e4372729d55925bc742e5d3a602240523b4a235))
+* misc style fixes ([dc314b8](https://github.com/zendesk/copenhagen_theme/commit/dc314b8e8631049c42eee701df2bd8fbb0bb8963))
+* tests ([a38da09](https://github.com/zendesk/copenhagen_theme/commit/a38da09a81d698470904bc34d3e2ea230b9dffb9))
+* update test mock ([e9724db](https://github.com/zendesk/copenhagen_theme/commit/e9724db33fe85b5717993c0adfa587344d7d7228))
+* various style fixes ([28936e6](https://github.com/zendesk/copenhagen_theme/commit/28936e645b5009c02f3653ee299a38ab6f887ba4))
+
+# [4.14.0](https://github.com/zendesk/copenhagen_theme/compare/v4.13.3...v4.14.0) (2025-11-18)
+
+
+### Bug Fixes
+
+* added aria-expanded="false" to all dropdown-toggle buttons in template files ([3a45137](https://github.com/zendesk/copenhagen_theme/commit/3a45137a4e5242f2a55156304b82caf4f669d608))
+* ensure Dropdown constructs target buttons w/ aria-expanded="false", updates value when toggled ([c43b3c5](https://github.com/zendesk/copenhagen_theme/commit/c43b3c55169dea8ceea408c8f689421b193e00d1))
+
+
+### Features
+
+* changed Dropdown class to add necessary attributes (aria-expanded, aria-haspopup) if missing ([4254bcb](https://github.com/zendesk/copenhagen_theme/commit/4254bcba32c63e6c11c4ad33cbab4879383e1306))
+
+## [4.13.3](https://github.com/zendesk/copenhagen_theme/compare/v4.13.2...v4.13.3) (2025-11-12)
+
+
+### Bug Fixes
+
+* correct asset filtering logic by asset types ([6b8058a](https://github.com/zendesk/copenhagen_theme/commit/6b8058aaed063b48ce4e0c31a476fd166a99d1d7))
+
+## [4.13.2](https://github.com/zendesk/copenhagen_theme/compare/v4.13.1...v4.13.2) (2025-11-11)
+
+
+### Bug Fixes
+
+* **a11y:** add accessible name to subscriptions table ([10c5f61](https://github.com/zendesk/copenhagen_theme/commit/10c5f6106448963333a35716a1cc1f0644c1b65d))
+* **subscriptions_page:** improve subscription table for screen readers ([356116b](https://github.com/zendesk/copenhagen_theme/commit/356116bbb7c469556e159608945df7ec8ca2993c))
+
+## [4.13.1](https://github.com/zendesk/copenhagen_theme/compare/v4.13.0...v4.13.1) (2025-11-05)
+
+
+### Bug Fixes
+
+* add text truncation for long labels ([4ea83be](https://github.com/zendesk/copenhagen_theme/commit/4ea83be51666553460169fe6dbb140ff7785776e))
+
+# [4.13.0](https://github.com/zendesk/copenhagen_theme/compare/v4.12.0...v4.13.0) (2025-11-03)
+
+
+### Features
+
+* implement new webform experience for generative AI ([c858873](https://github.com/zendesk/copenhagen_theme/commit/c85887316b7f11cd0f14c8effca3c13bc299cac9))
+
 # [4.12.0](https://github.com/zendesk/copenhagen_theme/compare/v4.11.1...v4.12.0) (2025-10-29)
 
 

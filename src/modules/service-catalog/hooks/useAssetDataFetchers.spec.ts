@@ -2,19 +2,36 @@ import { renderHook, act } from "@testing-library/react-hooks";
 import { useAssetDataFetchers } from "./useAssetDataFetchers";
 
 describe("useAssetDataFetchers (direct option IDs)", () => {
-  const assetOptionRecordPayload = (ids?: string) => ({
+  const assetOptionRecordPayload = (
+    ids?: string,
+    description?: string,
+    name?: string
+  ) => ({
     custom_object_record: {
+      ...(name !== undefined && { name }),
       custom_object_fields: {
         ...(ids !== undefined && { "standard::asset_filter_ids": ids }),
+        ...(description !== undefined && {
+          "standard::description": description,
+        }),
       },
     },
   });
 
-  const assetTypeOptionRecordPayload = (ids?: string, isHidden?: boolean) => ({
+  const assetTypeOptionRecordPayload = (
+    ids?: string,
+    isHidden?: boolean,
+    description?: string,
+    name?: string
+  ) => ({
     custom_object_record: {
+      ...(name !== undefined && { name }),
       custom_object_fields: {
         ...(ids !== undefined && { "standard::asset_type_ids": ids }),
         ...(isHidden !== undefined && { "standard::is_hidden": isHidden }),
+        ...(description !== undefined && {
+          "standard::description": description,
+        }),
       },
     },
   });
@@ -24,10 +41,15 @@ describe("useAssetDataFetchers (direct option IDs)", () => {
     global.fetch = jest.fn() as jest.Mock;
   });
 
-  it("fetchAssets: returns ids when assetOptionId exists", async () => {
-    const mockAssetResponse = assetOptionRecordPayload("a1,a2,a3");
+  it("fetchAssets: returns ids, description, and name when assetOptionId exists", async () => {
+    const mockAssetResponse = assetOptionRecordPayload(
+      "a1,a2,a3",
+      "Test description",
+      "Assigned asset"
+    );
 
     (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
       json: () => Promise.resolve(mockAssetResponse),
     });
 
@@ -35,16 +57,26 @@ describe("useAssetDataFetchers (direct option IDs)", () => {
       useAssetDataFetchers("AO-123", "AT-999")
     );
 
-    let ids: string | undefined;
+    let response:
+      | {
+          assetIds: string | undefined;
+          assetDescription: string | undefined;
+          assetName: string | undefined;
+        }
+      | undefined;
     await act(async () => {
-      ids = await result.current.fetchAssets();
+      response = await result.current.fetchAssets();
     });
 
     expect(global.fetch).toHaveBeenCalledTimes(1);
     expect(global.fetch).toHaveBeenCalledWith(
       `/api/v2/custom_objects/standard::service_catalog_asset_option/records/AO-123`
     );
-    expect(ids).toBe("a1,a2,a3");
+    expect(response).toEqual({
+      assetIds: "a1,a2,a3",
+      assetDescription: "Test description",
+      assetName: "Assigned asset",
+    });
   });
 
   it("fetchAssets: returns undefined when assetOptionId is missing", async () => {
@@ -53,39 +85,69 @@ describe("useAssetDataFetchers (direct option IDs)", () => {
       useAssetDataFetchers(undefined, "AT-999")
     );
 
-    let ids: string | undefined;
+    let response:
+      | {
+          assetIds: string | undefined;
+          assetDescription: string | undefined;
+          assetName: string | undefined;
+        }
+      | undefined;
     await act(async () => {
-      ids = await result.current.fetchAssets();
+      response = await result.current.fetchAssets();
     });
 
     expect(global.fetch).not.toHaveBeenCalled();
-    expect(ids).toBeUndefined();
+    expect(response).toBeUndefined();
   });
 
-  it("fetchAssets: returns undefined on error", async () => {
+  it("fetchAssets: throws error on network failure", async () => {
     (global.fetch as jest.Mock).mockRejectedValueOnce(new Error("boom"));
 
     const { result } = renderHook(() =>
       useAssetDataFetchers("AO-123", "AT-999")
     );
 
-    let ids: string | undefined;
-    await act(async () => {
-      ids = await result.current.fetchAssets();
-    });
-
-    expect(ids).toBeUndefined();
+    await expect(result.current.fetchAssets()).rejects.toThrow("boom");
   });
 
-  it("fetchAssetTypes: returns object with ids and hidden flag", async () => {
+  it("fetchAssets: throws error on non-ok response", async () => {
     (global.fetch as jest.Mock).mockResolvedValueOnce({
-      json: () => Promise.resolve(assetTypeOptionRecordPayload("t1,t2", true)),
+      ok: false,
+      status: 404,
+    });
+
+    const { result } = renderHook(() =>
+      useAssetDataFetchers("AO-123", "AT-999")
+    );
+
+    await expect(result.current.fetchAssets()).rejects.toThrow(
+      "Error fetching asset data"
+    );
+  });
+
+  it("fetchAssetTypes: returns object with ids, hidden flag, description, and name", async () => {
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: () =>
+        Promise.resolve(
+          assetTypeOptionRecordPayload(
+            "t1,t2",
+            true,
+            "Type description",
+            "Asset Type"
+          )
+        ),
     });
 
     const { result } = renderHook(() => useAssetDataFetchers("AO-1", "AT-123"));
 
     let out:
-      | { assetTypeIds?: string; isHiddenAssetsType?: boolean }
+      | {
+          assetTypeIds?: string;
+          isHiddenAssetsType?: boolean;
+          assetTypeDescription?: string;
+          assetTypeName?: string;
+        }
       | undefined;
 
     await act(async () => {
@@ -96,7 +158,12 @@ describe("useAssetDataFetchers (direct option IDs)", () => {
     expect(global.fetch).toHaveBeenCalledWith(
       `/api/v2/custom_objects/standard::service_catalog_asset_type_option/records/AT-123`
     );
-    expect(out).toEqual({ assetTypeIds: "t1,t2", isHiddenAssetsType: true });
+    expect(out).toEqual({
+      assetTypeIds: "t1,t2",
+      isHiddenAssetsType: true,
+      assetTypeDescription: "Type description",
+      assetTypeName: "Asset Type",
+    });
   });
 
   it("fetchAssetTypes: returns undefined when assetTypeOptionId is missing", async () => {
@@ -106,7 +173,12 @@ describe("useAssetDataFetchers (direct option IDs)", () => {
     );
 
     let out:
-      | { assetTypeIds?: string; isHiddenAssetsType?: boolean }
+      | {
+          assetTypeIds?: string;
+          isHiddenAssetsType?: boolean;
+          assetTypeDescription?: string;
+          assetTypeName?: string;
+        }
       | undefined;
 
     await act(async () => {
@@ -117,23 +189,25 @@ describe("useAssetDataFetchers (direct option IDs)", () => {
     expect(out).toBeUndefined();
   });
 
-  it("fetchAssetTypes: returns { undefined, undefined } on error", async () => {
+  it("fetchAssetTypes: throws error on network failure", async () => {
     (global.fetch as jest.Mock).mockRejectedValueOnce(new Error("network"));
 
     const { result } = renderHook(() => useAssetDataFetchers("AO-1", "AT-err"));
 
-    let out:
-      | { assetTypeIds?: string; isHiddenAssetsType?: boolean }
-      | undefined;
+    await expect(result.current.fetchAssetTypes()).rejects.toThrow("network");
+  });
 
-    await act(async () => {
-      out = await result.current.fetchAssetTypes();
+  it("fetchAssetTypes: throws error on non-ok response", async () => {
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: false,
+      status: 500,
     });
 
-    expect(out).toEqual({
-      assetTypeIds: undefined,
-      isHiddenAssetsType: undefined,
-    });
+    const { result } = renderHook(() => useAssetDataFetchers("AO-1", "AT-err"));
+
+    await expect(result.current.fetchAssetTypes()).rejects.toThrow(
+      "Error fetching asset type data"
+    );
   });
 
   it("gracefully handles both option IDs undefined", async () => {
@@ -142,9 +216,20 @@ describe("useAssetDataFetchers (direct option IDs)", () => {
       useAssetDataFetchers(undefined, undefined)
     );
 
-    let assets: string | undefined;
+    let assets:
+      | {
+          assetIds: string | undefined;
+          assetDescription: string | undefined;
+          assetName: string | undefined;
+        }
+      | undefined;
     let assetTypes:
-      | { assetTypeIds?: string; isHiddenAssetsType?: boolean }
+      | {
+          assetTypeIds?: string;
+          isHiddenAssetsType?: boolean;
+          assetTypeDescription?: string;
+          assetTypeName?: string;
+        }
       | undefined;
 
     await act(async () => {
