@@ -4986,6 +4986,9 @@ html[dir=rtl] .notification-left-aligned {
     transform: translate3d(0, 100%, 0);
   }
 }
+.fa-arrow-circle-up {
+background-image: $assets-arrow-circle-up-solid-svg;
+}
 
 .ns-effect-slidetop.ns-show,
 .ns-effect-slidetop.ns-hide {
