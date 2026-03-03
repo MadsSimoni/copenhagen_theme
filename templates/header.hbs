@@ -34,10 +34,11 @@
             </div>
           </li>
         {{/if}}
+    <!--<li>{{link 'service_catalog'}}</li>-->
     <!--<li>{{link 'new_request' class='submit-a-request'}}</li>-->
     <!--{{#unless signed_in}}
           <li>
-            {{#link "sign_in" class="sign-in"}}
+            {{#link "sign_in" class="sign-in" role="link"}}
               {{t 'sign_in'}}
             {{/link}}
           </li>
@@ -46,7 +47,7 @@
     </nav>
     {{#if signed_in}}
       <div class="user-info dropdown">
-        <button class="dropdown-toggle" aria-haspopup="true">
+        <button class="dropdown-toggle" aria-haspopup="true" aria-expanded="false">
           {{user_avatar class="user-avatar"}}
           <span>
             {{user_name}}
@@ -59,6 +60,7 @@
           {{#my_profile role="menuitem"}}{{t 'profile'}}{{/my_profile}}
           {{link "requests" role="menuitem"}}
           {{#link "contributions" role="menuitem"}}{{t "activities"}}{{/link}}
+          {{link "approval_requests" role="menuitem"}}
           {{contact_details role="menuitem"}}
           {{change_password role="menuitem"}}
           <div class="separator" role="separator"></div>
@@ -81,7 +83,7 @@
       <ul class="menu-list-mobile-items">
         {{#if signed_in}}
           <li class="user-avatar-item item">
-            {{#my_profile role="menuitem" class="my-profile"}}
+            {{#my_profile class="my-profile"}}
               {{user_avatar class="menu-profile-avatar"}}
               <div class="menu-profile-name">
                 <div>{{user_name}}</div>
@@ -89,10 +91,11 @@
               </div>
             {{/my_profile}}
           </li>
-          <li class="item">{{link "requests" role="menuitem"}}</li>
-          <li class="item">{{#link "contributions" role="menuitem"}}{{t "activities"}}{{/link}}</li>
-          <li class="item">{{contact_details role="menuitem"}}</li>
-          <li class="item">{{change_password role="menuitem" class='change-password'}}</li>
+          <li class="item">{{link "requests"}}</li>
+          <li class="item">{{#link "contributions"}}{{t "activities"}}{{/link}}</li>
+          <li class="item">{{link "approval_requests"}}</li>
+          <li class="item">{{contact_details}}</li>
+          <li class="item">{{change_password class='change-password'}}</li>
           <li class="nav-divider"></li>
         {{else}}
           <li class="item">
@@ -103,12 +106,13 @@
           </li>
           <li class="nav-divider"></li>
         {{/if}}
-        <li class="item">{{link 'community' role="menuitem"}}</li>
-    <!--<li class="item">{{link 'new_request' role="menuitem" class='submit-a-request'}}</li>-->
+        <li class="item">{{link 'community'}}</li>
+        <!--<li class="item">{{link 'new_request' class='submit-a-request'}}</li>-->
+        <li class="item">{{link 'service_catalog'}}</li>
         <li class="nav-divider"></li>
         {{#if signed_in}}
           <li class="item">
-            {{link "sign_out" role="menuitem"}}
+            {{link "sign_out"}}
           </li>
         {{/if}}
       </ul>
