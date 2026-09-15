@@ -12,6 +12,9 @@ import type {
   AssetOptionData,
   AssetConfig,
 } from "../data-types/Assets";
+import { sanitizeFieldDescription } from "../utils/sanitize";
+import { applyPrefillToFields } from "../utils/applyPrefillToFields";
+import { useQueryStringPrefill } from "./useQueryStringPrefill";
 
 const ASSET_TYPE_KEY = "zen:custom_object:standard::itam_asset_type";
 const ASSET_KEY = "zen:custom_object:standard::itam_asset";
@@ -80,7 +83,9 @@ const formatField = (field: TicketField): TicketFieldObject => {
     relationship_filter,
   } = field;
 
-  const sanitizedDescription = linkifyStr(description);
+  const sanitizedDescription = sanitizeFieldDescription(
+    linkifyStr(description)
+  );
 
   return {
     id,
@@ -109,6 +114,13 @@ const isAssociatedLookupField = (field: TicketField) => {
   return customObjectKey === "standard::service_catalog_item";
 };
 
+const isCategoryLookupField = (field: TicketField) => {
+  const customObjectKey = getCustomObjectKey(
+    field.relationship_target_type as string
+  );
+  return customObjectKey === "standard::service_catalog_category";
+};
+
 const isHiddenServiceCatalogLookup = (field: TicketField) => {
   const customObjectKey = getCustomObjectKey(
     field.relationship_target_type as string
@@ -125,7 +137,9 @@ const enrichFieldsWithAssetConfig = (
       return {
         ...field,
         label: assetConfig.assetTypeLabel || field.label,
-        description: assetConfig.assetTypeDescription || field.description,
+        description: sanitizeFieldDescription(
+          assetConfig.assetTypeDescription || field.description
+        ),
         required: assetConfig.assetTypeIsRequired || field.required,
       };
     }
@@ -133,7 +147,9 @@ const enrichFieldsWithAssetConfig = (
       return {
         ...field,
         label: assetConfig.assetLabel || field.label,
-        description: assetConfig.assetDescription || field.description,
+        description: sanitizeFieldDescription(
+          assetConfig.assetDescription || field.description
+        ),
         required: assetConfig.assetIsRequired || field.required,
       };
     }
@@ -144,6 +160,7 @@ const enrichFieldsWithAssetConfig = (
 interface FetchTicketFieldsResult {
   requestFields: TicketFieldObject[];
   associatedLookupField: TicketFieldObject | null;
+  categoryLookupField: TicketFieldObject | null;
   endUserConditions: EndUserCondition[];
 }
 
@@ -176,6 +193,7 @@ const fetchTicketFields = async (
 
   const ticketFieldsData = fieldsData.ticket_fields;
   let associatedLookupField: TicketFieldObject | null = null;
+  let categoryLookupField: TicketFieldObject | null = null;
 
   const requestFields = ids
     .map((id: number) => {
@@ -196,6 +214,8 @@ const fetchTicketFields = async (
         ) {
           if (isAssociatedLookupField(ticketField)) {
             associatedLookupField = ticketField;
+          } else if (isCategoryLookupField(ticketField)) {
+            categoryLookupField = ticketField;
           }
           return null;
         }
@@ -209,7 +229,12 @@ const fetchTicketFields = async (
     throw new Error("Associated lookup field not found");
   }
 
-  return { requestFields, associatedLookupField, endUserConditions };
+  return {
+    requestFields,
+    associatedLookupField,
+    categoryLookupField,
+    endUserConditions,
+  };
 };
 
 export function useItemFormFields(
@@ -224,6 +249,8 @@ export function useItemFormFields(
   >([]);
   const [associatedLookupField, setAssociatedLookupField] =
     useState<TicketFieldObject | null>();
+  const [categoryLookupField, setCategoryLookupField] =
+    useState<TicketFieldObject | null>(null);
   const [error, setError] = useState<unknown>(null);
   const [isRequestFieldsLoading, setIsRequestFieldsLoading] = useState(false);
   const [assetConfig, setAssetConfig] = useState<AssetConfig>({
@@ -245,6 +272,10 @@ export function useItemFormFields(
     assetTypeOptionId ?? ""
   );
 
+  // Prefill (PDSC-954) is applied to the full field set before visibility is
+  // computed, so a prefilled parent reveals its conditional children.
+  const prefill = useQueryStringPrefill();
+
   useEffect(() => {
     if (!serviceCatalogItem?.form_id) return;
 
@@ -264,8 +295,12 @@ export function useItemFormFields(
 
         if (!alive) return;
 
-        const { requestFields, associatedLookupField, endUserConditions } =
-          ticketFieldsResult;
+        const {
+          requestFields,
+          associatedLookupField,
+          categoryLookupField,
+          endUserConditions,
+        } = ticketFieldsResult;
 
         const processedAssetConfig = processAssetConfig(
           assetTypeData,
@@ -273,13 +308,15 @@ export function useItemFormFields(
         );
         setAssetConfig(processedAssetConfig);
         setAssociatedLookupField(associatedLookupField);
+        setCategoryLookupField(categoryLookupField);
         setEndUserConditions(endUserConditions);
 
         const enrichedFields = enrichFieldsWithAssetConfig(
           requestFields,
           processedAssetConfig
         );
-        setAllRequestFields(enrichedFields);
+        const prefilledFields = applyPrefillToFields(enrichedFields, prefill);
+        setAllRequestFields(prefilledFields);
       } catch (error) {
         if (alive) {
           setError(error);
@@ -296,13 +333,19 @@ export function useItemFormFields(
     return () => {
       alive = false;
     };
-  }, [baseLocale, serviceCatalogItem?.form_id, fetchAssets, fetchAssetTypes]);
+  }, [
+    baseLocale,
+    serviceCatalogItem?.form_id,
+    fetchAssets,
+    fetchAssetTypes,
+    prefill,
+  ]);
 
   const handleChange = useCallback(
     (field: TicketFieldObject, value: TicketFieldObject["value"]) => {
       const updatedFields = allRequestFields.map((ticketField) =>
         ticketField.name === field.name
-          ? { ...ticketField, value }
+          ? { ...ticketField, value, error: null }
           : ticketField
       );
 
@@ -316,6 +359,7 @@ export function useItemFormFields(
   return {
     requestFields,
     associatedLookupField,
+    categoryLookupField,
     error,
     setRequestFields: setAllRequestFields,
     handleChange,

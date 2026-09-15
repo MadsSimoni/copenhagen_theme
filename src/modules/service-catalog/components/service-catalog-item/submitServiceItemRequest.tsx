@@ -2,6 +2,11 @@ import type { TicketFieldObject } from "../../../ticket-fields/data-types/Ticket
 import type { ServiceCatalogItem } from "../../data-types/ServiceCatalogItem";
 import type { Attachment } from "../../../ticket-fields/data-types/AttachmentsField";
 
+interface OnBehalfNote {
+  submitterLabel: string;
+  requesterLabel: string;
+}
+
 const getCurrentUser = async () => {
   try {
     const currentUserRequest = await fetch("/api/v2/users/me.json");
@@ -15,13 +20,46 @@ const getCurrentUser = async () => {
   }
 };
 
+const buildCommentHtml = (
+  serviceCatalogItem: ServiceCatalogItem,
+  helpCenterPath: string,
+  onBehalfNote?: OnBehalfNote | null
+) => {
+  const link = document.createElement("a");
+  link.setAttribute(
+    "href",
+    `${window.location.origin}${helpCenterPath}/services/${serviceCatalogItem.id}`
+  );
+  link.setAttribute("style", "text-decoration: underline");
+  link.setAttribute("target", "_blank");
+  link.setAttribute("rel", "noopener noreferrer");
+  link.textContent = serviceCatalogItem.name;
+
+  if (!onBehalfNote) {
+    return link.outerHTML;
+  }
+
+  const submitter = document.createElement("p");
+  submitter.setAttribute("style", "margin:0;padding:0");
+  submitter.textContent = onBehalfNote.submitterLabel;
+
+  const requester = document.createElement("p");
+  requester.setAttribute("style", "margin:0;padding:0");
+  requester.textContent = onBehalfNote.requesterLabel;
+
+  return `${link.outerHTML}${submitter.outerHTML}${requester.outerHTML}`;
+};
+
 export async function submitServiceItemRequest(
   serviceCatalogItem: ServiceCatalogItem,
   requestFields: TicketFieldObject[],
   associatedLookupField: TicketFieldObject,
-  baseLocale: string,
   attachments: Attachment[],
-  helpCenterPath: string
+  helpCenterPath: string,
+  categoryLookupField?: TicketFieldObject | null,
+  categoryId?: string | null,
+  requesterId?: number | null,
+  onBehalfNote?: OnBehalfNote | null
 ) {
   try {
     const currentUser = await getCurrentUser();
@@ -33,7 +71,21 @@ export async function submitServiceItemRequest(
         value: field.value,
       };
     });
-    const response = await fetch(`/api/v2/requests?locale=${baseLocale}`, {
+
+    const lookupFields: Array<{ id: number; value: string | number }> = [
+      { id: associatedLookupField.id, value: serviceCatalogItem.id },
+    ];
+
+    if (categoryLookupField && categoryId) {
+      lookupFields.push({ id: categoryLookupField.id, value: categoryId });
+    }
+
+    const submitterId = currentUser.user.id;
+
+    const isRequestingOnBehalf =
+      requesterId != null && requesterId !== submitterId;
+
+    const response = await fetch("/hc/api/v2/service_catalog/requests", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -41,20 +93,20 @@ export async function submitServiceItemRequest(
       },
       body: JSON.stringify({
         request: {
+          item_id: serviceCatalogItem.id,
           subject: `${serviceCatalogItem.name}`,
           comment: {
-            html_body: `<a href="${window.location.origin}${helpCenterPath}/services/${serviceCatalogItem.id}" style="text-decoration: underline" target="_blank" rel="noopener noreferrer">${serviceCatalogItem.name}</a>`,
+            html_body: buildCommentHtml(
+              serviceCatalogItem,
+              helpCenterPath,
+              onBehalfNote
+            ),
             uploads: uploadTokens,
           },
-          ticket_form_id: serviceCatalogItem.form_id,
-          custom_fields: [
-            ...customFields,
-            { id: associatedLookupField.id, value: serviceCatalogItem.id },
-          ],
-          via: {
-            channel: "web form",
-            source: 50,
-          },
+          custom_fields: [...customFields, ...lookupFields],
+          ...(isRequestingOnBehalf
+            ? { requester_id: requesterId, collaborators: [submitterId] }
+            : {}),
         },
       }),
     });

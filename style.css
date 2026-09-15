@@ -867,6 +867,56 @@ ul {
   display: none;
 }
 
+.ask-ai {
+  align-items: center;
+  background-color: $link_color;
+  border: 1px solid $link_color;
+  border-radius: 4px;
+  color: $brand_text_color;
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 600;
+  gap: 6px;
+  line-height: 1.4286;
+  padding: 6px 14px;
+}
+.ask-ai:visited {
+  color: $brand_text_color;
+}
+.ask-ai .ask-ai-icon {
+  flex-shrink: 0;
+}
+
+.nav-wrapper-desktop .ask-ai {
+  margin-inline-end: 16px;
+  padding: 6px 14px;
+}
+.nav-wrapper-desktop .ask-ai, .nav-wrapper-desktop .ask-ai:visited {
+  color: $brand_text_color;
+}
+.nav-wrapper-desktop .ask-ai:hover, .nav-wrapper-desktop .ask-ai:focus, .nav-wrapper-desktop .ask-ai:active {
+  background-color: $hover_link_color;
+  border-color: $hover_link_color;
+  color: $brand_text_color;
+  text-decoration: none;
+}
+
+.nav-wrapper-mobile .ask-ai {
+  margin: 4px 24px;
+  padding: 6px 14px;
+  width: auto;
+  height: auto;
+}
+.nav-wrapper-mobile .ask-ai, .nav-wrapper-mobile .ask-ai:visited {
+  color: $brand_text_color;
+}
+.nav-wrapper-mobile .ask-ai:hover, .nav-wrapper-mobile .ask-ai:focus, .nav-wrapper-mobile .ask-ai:active {
+  background-color: $hover_link_color;
+  border-color: $hover_link_color;
+  color: $brand_text_color;
+  text-decoration: none;
+}
+
 /***** User info in header *****/
 .user-info {
   display: inline-block;
@@ -988,11 +1038,13 @@ ul {
   }
 }
 .breadcrumbs li {
+  display: inline-block;
   color: lighten($text_color, 20%);
   font-size: 13px;
   max-width: 450px;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .breadcrumbs li + li::before {
   content: ">";
@@ -3387,6 +3439,7 @@ ul {
 }
 .request-main {
   flex: 1 0 auto;
+  max-width: 100%;
   order: 1;
 }
 .request-main .comment-fields, .request-main .request-submit-comment {
@@ -3513,6 +3566,7 @@ ul {
   line-break: strict;
   color: lighten($text_color, 20%);
   width: 40%;
+  overflow-wrap: break-word;
 }
 .request-details .request-collaborators {
   display: inline-block;
@@ -4286,7 +4340,7 @@ ul {
     display: block;
   }
 }
-.search-results-sidebar .multibrand-filter-list--collapsed li:nth-child(1n+6) {
+.search-results-sidebar .multibrand-filter-list--collapsed li:nth-child(1n+6):not(.see-all-filters-item) {
   display: none;
 }
 .search-results-sidebar .multibrand-filter-list .doc-count {
@@ -5248,4 +5302,23 @@ zd-summary-block {
   color: lighten($text_color, 20%);
   font-style: italic;
   padding: 0 15px;
+}
+.service-catalog-main-content {
+  display: flex;
+  gap: 32px;
+}
+.service-catalog-list {
+  width: 100%;
+}
+.service-catalog-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.is-service-catalog-preview #navbar-container,
+.is-service-catalog-preview .navbar-container,
+.is-service-catalog-preview .assembly-bar,
+.is-service-catalog-preview [data-garden-id="chrome.subnav"] {
+  display: none !important;
 }

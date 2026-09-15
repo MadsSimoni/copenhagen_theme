@@ -5,18 +5,9 @@ import RequestsToolbar from "../requests-toolbar/RequestsToolbar";
 import { RequestsTable } from "../requests-table/RequestsTable";
 import RequestsTabs from "../requests-tabs/RequestsTabs";
 import type { FilterValuesMap } from "../../data-types/FilterValue";
-import type {
-  RequestListParams,
-  SelectedTab,
-} from "../../data-types/request-list-params";
+import type { SelectedTab } from "../../data-types/request-list-params";
 
-import {
-  MY_REQUESTS_TAB_NAME,
-  ORG_REQUESTS_TAB_NAME,
-} from "../../data-types/request-list-params";
-
-import { serializeRequestListParams } from "../../utils/serializeRequestListParams";
-import { deserializeRequestListParams } from "../../utils/deserializeRequestListParams";
+import { ORG_REQUESTS_TAB_NAME } from "../../data-types/request-list-params";
 
 import { useUser } from "../../hooks/useUser";
 import { useOrganizations } from "../../hooks/useOrganizations";
@@ -28,25 +19,17 @@ import { useShowManyUsers } from "../../hooks/useShowManyUsers";
 export interface RequestsListProps {
   locale: string;
   customStatusesEnabled: boolean;
+  viewRequestsAcrossBrandsEnabled: boolean;
 }
 
 export function RequestsList({
   locale,
   customStatusesEnabled,
+  viewRequestsAcrossBrandsEnabled,
 }: RequestsListProps): JSX.Element {
   const { t } = useTranslation();
 
-  const { params, push } = useParams<RequestListParams>(
-    {
-      query: "",
-      page: 1,
-      sort: { order: "desc", by: "updated_at" },
-      selectedTab: { name: MY_REQUESTS_TAB_NAME },
-      filters: {},
-    },
-    serializeRequestListParams,
-    deserializeRequestListParams
-  );
+  const { params, push } = useParams();
 
   const { query, page, sort, selectedTab, filters } = params;
 
@@ -67,7 +50,7 @@ export function RequestsList({
     ticketFields,
     isLoading: isLoadingTicketFields,
     error: ticketFieldsError,
-  } = useTicketFields(locale);
+  } = useTicketFields(locale, viewRequestsAcrossBrandsEnabled);
 
   const loadingError = requestsError || ticketFieldsError || userError;
 
@@ -94,7 +77,6 @@ export function RequestsList({
     push({
       page: 1,
       selectedTab: newSelectedTab,
-      filters: {},
     });
   };
 

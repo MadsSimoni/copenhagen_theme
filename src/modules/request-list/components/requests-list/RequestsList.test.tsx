@@ -46,7 +46,13 @@ const renderComponent = async (params?: Partial<RequestListParams>) => {
     push,
   });
 
-  render(<RequestsList locale="en-us" customStatusesEnabled={false} />);
+  render(
+    <RequestsList
+      locale="en-us"
+      customStatusesEnabled={false}
+      viewRequestsAcrossBrandsEnabled={false}
+    />
+  );
 
   // This is needed because of a “bug” with the Jest fake timers
   // See: https://github.com/facebook/jest/issues/10221
@@ -96,17 +102,26 @@ describe("Rendering", () => {
     expect(screen.getAllByText("Open")[0]).toBeInTheDocument();
   }, 10000);
 
-  test("applies a default sort of updated at and descending", async () => {
+  test("renders default columns when ticketFields is empty", async () => {
+    (useTicketFields as jest.Mock).mockReturnValue({
+      ticketFields: [],
+    });
+
     await renderComponent();
 
-    expect(useParams).toHaveBeenCalledWith(
-      expect.objectContaining({
-        sort: { order: "desc", by: "updated_at" },
-      }),
-      expect.any(Function),
-      expect.any(Function)
-    );
-  });
+    expect(screen.getByRole("button", { name: /id/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /created date/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /updated date/i })
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /status/i })).toBeInTheDocument();
+
+    expect(
+      screen.getByRole("link", { name: "My request" })
+    ).toBeInTheDocument();
+  }, 10000);
 
   test("renders the request description when the subject is empty", async () => {
     await renderComponent();
@@ -324,7 +339,7 @@ describe("Filter tabs", () => {
       selectedTab: { name: ORG_REQUESTS_TAB_NAME, organizationId: 1 },
     });
 
-    fireEvent.click(screen.getByRole("combobox", { name: "Organization" }));
+    fireEvent.click(screen.getByLabelText("Organization"));
     fireEvent.click(
       screen.getByRole("option", { name: "Another Organization" })
     );
@@ -345,7 +360,6 @@ describe("Filter tabs", () => {
     expect(push).toHaveBeenCalledWith({
       page: 1,
       selectedTab: { name: ORG_REQUESTS_TAB_NAME, organizationId: 1 },
-      filters: {},
     });
   });
 });
