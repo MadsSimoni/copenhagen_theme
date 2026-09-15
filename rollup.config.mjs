@@ -42,7 +42,10 @@ export default defineConfig([
     output: {
       dir: "assets",
       format: "es",
-      manualChunks: (id) => {
+      manualChunks: (rawId) => {
+        // Normalize Windows path separators so the checks below work on all platforms
+        const id = rawId.replace(/\\/g, "/");
+
         if (
           id.includes("node_modules/@zendesk/help-center-wysiwyg") ||
           id.includes("node_modules/@ckeditor5")

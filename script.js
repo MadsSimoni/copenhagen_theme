@@ -671,56 +671,54 @@
     }
   });
 
+  // Notification banner
+  // Shows published articles with the label "drift" as a dismissible banner in `.alertbox`
+
+  // Article labels to be considered for the alerts
+  const LABELS = "drift,Drift";
+
+  window.addEventListener("DOMContentLoaded", () => {
+    const alertbox = document.querySelector(".alertbox");
+    if (!alertbox) {
+      return;
+    }
+
+    const locale = document.documentElement.getAttribute("lang").toLowerCase();
+    const url = `/api/v2/help_center/${locale}/articles.json?label_names=${LABELS}`;
+
+    fetch(url)
+      .then((response) => response.json())
+      .then((data) => {
+        const articles = (data && data.articles) || [];
+
+        articles.forEach((article) => {
+          if (sessionStorage.getItem(article.id) === "closed") {
+            return;
+          }
+
+          const html = `
+          <div id=${article.id} class="ns-box ns-bar ns-effect-slidetop ns-type-notice ns-show">
+            <div class="ns-box-inner">
+              <span class="megaphone"></span>
+              <p>
+                <a href="${article.html_url}">${article.title} | Tryk her for at læse mere</a>
+              </p>
+            </div>
+            <span class="ns-close"></span>
+          </div>
+        `;
+          alertbox.insertAdjacentHTML("beforeend", html);
+        });
+      });
+  });
+
+  // Close alert and remember it for the rest of the session
+  document.addEventListener("click", (event) => {
+    if (event.target.matches(".ns-close")) {
+      event.preventDefault();
+      sessionStorage.setItem(event.target.parentElement.id, "closed");
+      event.target.parentElement.remove();
+    }
+  });
+
 })();
-
-// MW-Notification Banner
-document.addEventListener('DOMContentLoaded', async function () {
-  // Article label to be considered for the alerts
-  const label = 'drift,Drift'
-
-  // Get current help center locale
-  const locale = document
-      .querySelector('html')
-      .getAttribute('lang')
-      .toLowerCase()
-
-  // URL to be called to get the alert data
-  const url = `/api/v2/help_center/${locale}/articles.json?label_names=${label}`
-
-  // Raw data collected from the endpoint above
-  const data = await (await fetch(url)).json()
-
-  // List of articles returned
-  const articles = (data && data.articles) || []
-
-  // Handle returned articles
-  for (let i = 0; i < articles.length; i++) {
-    const url = articles[i].html_url
-    const title = articles[i].title
-    const aid = articles[i].id
-    if (sessionStorage.getItem(aid) === "closed") {continue}
-    const html = `
-      <div id=${aid} class="ns-box ns-bar ns-effect-slidetop ns-type-notice ns-show">
-        <div class="ns-box-inner">
-          <span class="megaphone"></span>
-          <p>
-            <a href="${url}">${title} | Tryk her for at læse mere</a>
-          </p>
-        </div>
-        <span class="ns-close"></span>
-      </div>
-    `
-    // Append current alert to the alertbox container
-    document.querySelector('.alertbox').insertAdjacentHTML('beforeend', html)
-  }
-})
-
-
-document.addEventListener('click', function (event) {
-  // Close alertbox
-  if (event.target.matches('.ns-close')) {
-    event.preventDefault()
-    sessionStorage.setItem(event.target.parentElement.id, "closed")
-    event.target.parentElement.remove()
-  }
-})
