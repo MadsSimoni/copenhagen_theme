@@ -90,6 +90,11 @@
     text-decoration: underline;
   }
 
+  &-body img {
+    border-style: solid;
+    border-width: thin;
+  }
+
   &-content {
     line-height: 1.6;
     margin: 40px 0;

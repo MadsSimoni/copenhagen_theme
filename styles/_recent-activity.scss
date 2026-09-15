@@ -57,6 +57,7 @@
 
   &-item-time,
   &-item-comment {
+    display: none !important;
     display: inline-block;
     font-size: $font-size-small;
   }
