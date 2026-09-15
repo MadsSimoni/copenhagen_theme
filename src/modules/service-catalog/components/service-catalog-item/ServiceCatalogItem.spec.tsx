@@ -6,6 +6,7 @@ import { submitServiceItemRequest } from "./submitServiceItemRequest";
 import * as notifications from "../../../shared/notifications";
 import type { ServiceCatalogItem as ServiceCatalogItemType } from "../../data-types/ServiceCatalogItem";
 import type { TicketFieldObject } from "../../../ticket-fields/data-types/TicketFieldObject";
+import { PREVIEW_MODE_HTML_CLASS } from "../../constants";
 
 // Mock react-i18next
 jest.mock("react-i18next", () => ({
@@ -39,19 +40,51 @@ jest.mock("../../hooks/useAttachmentsOption", () => ({
   useAttachmentsOption: jest.fn(),
 }));
 
-// Mock ItemRequestForm to simplify testing
 jest.mock("./ItemRequestForm", () => ({
   ItemRequestForm: ({
     onSubmit,
+    isPreviewMode,
+    setSelectedUser,
   }: {
     onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+    isPreviewMode?: boolean;
+    setSelectedUser: (user: {
+      id: string;
+      name: string;
+      email: string;
+    }) => void;
   }) => (
-    <form data-testid="item-request-form" onSubmit={onSubmit}>
-      <button type="submit">Submit</button>
+    <form
+      data-testid="item-request-form"
+      data-preview-mode={isPreviewMode ? "true" : "false"}
+      onSubmit={onSubmit}
+    >
+      <button
+        type="button"
+        data-testid="select-beneficiary"
+        onClick={() =>
+          setSelectedUser({
+            id: "789",
+            name: "Beneficiary",
+            email: "beneficiary@example.com",
+          })
+        }
+      >
+        Select beneficiary
+      </button>
+      <button type="submit" disabled={isPreviewMode}>
+        Submit
+      </button>
     </form>
   ),
   ASSET_TYPE_KEY: "zen:custom_object:standard::itam_asset_type",
   ASSET_KEY: "zen:custom_object:standard::itam_asset",
+}));
+
+// Mock PreviewModeBanner so we can assert it renders without testing portal
+// behaviour here (it has its own dedicated specs).
+jest.mock("./PreviewModeBanner", () => ({
+  PreviewModeBanner: () => <div data-testid="preview-mode-banner-mock" />,
 }));
 
 import { useServiceCatalogItem } from "../../hooks/useServiceCatalogItem";
@@ -86,6 +119,7 @@ describe("ServiceCatalogItem", () => {
     userRole: "end_user",
     userId: 123,
     brandId: 456,
+    userName: "Test User",
     organizations: [],
     helpCenterPath: "/hc/en-us",
   };
@@ -96,11 +130,19 @@ describe("ServiceCatalogItem", () => {
     description: "Test Description",
     form_id: 100,
     thumbnail_url: "",
+    categories: [],
+    is_request_on_behalf: false,
+    published_at: "2025-01-01T00:00:00Z",
     custom_object_fields: {
       "standard::asset_option": "",
       "standard::asset_type_option": "",
       "standard::attachment_option": "",
     },
+  };
+
+  const mockDraftServiceCatalogItem: ServiceCatalogItemType = {
+    ...mockServiceCatalogItem,
+    published_at: null,
   };
 
   const mockRequestFields: TicketFieldObject[] = [
@@ -112,7 +154,7 @@ describe("ServiceCatalogItem", () => {
       label: "Field 1",
       required: true,
       options: [],
-      value: null,
+      value: "Field 1 value",
       error: null,
     },
   ];
@@ -151,6 +193,7 @@ describe("ServiceCatalogItem", () => {
     mockUseItemFormFields.mockReturnValue({
       requestFields: mockRequestFields,
       associatedLookupField: mockAssociatedLookupField,
+      categoryLookupField: null,
       error: null,
       setRequestFields: jest.fn(),
       handleChange: jest.fn(),
@@ -159,6 +202,178 @@ describe("ServiceCatalogItem", () => {
       isAssetTypeHidden: false,
       assetTypeIds: [],
       assetIds: [],
+    });
+  });
+
+  describe("preview mode", () => {
+    const baseHref = "http://localhost/hc/en-us/services/123";
+    const PREVIEW_CLASS = PREVIEW_MODE_HTML_CLASS;
+
+    const mockLocation = (search: string) => {
+      window.history.replaceState(null, "", `${baseHref}${search}`);
+    };
+
+    beforeEach(() => {
+      window.history.replaceState(null, "", baseHref);
+      document.documentElement.classList.remove(PREVIEW_CLASS);
+    });
+
+    afterEach(() => {
+      window.history.replaceState(null, "", baseHref);
+      document.documentElement.classList.remove(PREVIEW_CLASS);
+    });
+
+    it("does not render the preview banner for published items without the preview query param", () => {
+      mockLocation("");
+      mockUseServiceCatalogItem.mockReturnValue({
+        serviceCatalogItem: mockServiceCatalogItem,
+        errorFetchingItem: null,
+      });
+
+      renderWithTheme(<ServiceCatalogItem {...defaultProps} />);
+
+      expect(
+        screen.queryByTestId("preview-mode-banner-mock")
+      ).not.toBeInTheDocument();
+      expect(screen.getByTestId("item-request-form")).toHaveAttribute(
+        "data-preview-mode",
+        "false"
+      );
+      expect(document.documentElement).not.toHaveClass(PREVIEW_CLASS);
+    });
+
+    it("does not render the preview banner for published items even when ?preview=true is in the URL", () => {
+      mockLocation("?preview=true");
+      mockUseServiceCatalogItem.mockReturnValue({
+        serviceCatalogItem: mockServiceCatalogItem,
+        errorFetchingItem: null,
+      });
+
+      renderWithTheme(<ServiceCatalogItem {...defaultProps} />);
+
+      expect(
+        screen.queryByTestId("preview-mode-banner-mock")
+      ).not.toBeInTheDocument();
+      expect(screen.getByTestId("item-request-form")).toHaveAttribute(
+        "data-preview-mode",
+        "false"
+      );
+      expect(document.documentElement).not.toHaveClass(PREVIEW_CLASS);
+    });
+
+    it("removes ?preview=true from the URL once a published item is loaded", () => {
+      mockLocation("?preview=true&category_id=42");
+      mockUseServiceCatalogItem.mockReturnValue({
+        serviceCatalogItem: mockServiceCatalogItem,
+        errorFetchingItem: null,
+      });
+
+      renderWithTheme(<ServiceCatalogItem {...defaultProps} />);
+
+      expect(window.location.search).not.toContain("preview=true");
+      // Other params are preserved
+      expect(window.location.search).toContain("category_id=42");
+    });
+
+    it("activates preview mode for draft items even without the preview query param", () => {
+      mockLocation("");
+      mockUseServiceCatalogItem.mockReturnValue({
+        serviceCatalogItem: mockDraftServiceCatalogItem,
+        errorFetchingItem: null,
+      });
+
+      renderWithTheme(<ServiceCatalogItem {...defaultProps} />);
+
+      expect(
+        screen.getByTestId("preview-mode-banner-mock")
+      ).toBeInTheDocument();
+      expect(screen.getByTestId("item-request-form")).toHaveAttribute(
+        "data-preview-mode",
+        "true"
+      );
+      expect(screen.getByRole("button", { name: "Submit" })).toBeDisabled();
+      expect(document.documentElement).toHaveClass(PREVIEW_CLASS);
+    });
+
+    it("adds ?preview=true to the URL once a draft item is loaded so a refresh enters preview cleanly", () => {
+      mockLocation("?category_id=42");
+      mockUseServiceCatalogItem.mockReturnValue({
+        serviceCatalogItem: mockDraftServiceCatalogItem,
+        errorFetchingItem: null,
+      });
+
+      renderWithTheme(<ServiceCatalogItem {...defaultProps} />);
+
+      expect(window.location.search).toContain("preview=true");
+      // Other params are preserved
+      expect(window.location.search).toContain("category_id=42");
+    });
+
+    it("does not modify the URL when the param already matches the item state", () => {
+      mockLocation("?preview=true");
+      mockUseServiceCatalogItem.mockReturnValue({
+        serviceCatalogItem: mockDraftServiceCatalogItem,
+        errorFetchingItem: null,
+      });
+
+      const replaceStateSpy = jest.spyOn(window.history, "replaceState");
+      renderWithTheme(<ServiceCatalogItem {...defaultProps} />);
+
+      expect(replaceStateSpy).not.toHaveBeenCalled();
+      replaceStateSpy.mockRestore();
+    });
+
+    it("renders the preview banner and disables submit for draft items with the preview query param", () => {
+      mockLocation("?preview=true");
+      mockUseServiceCatalogItem.mockReturnValue({
+        serviceCatalogItem: mockDraftServiceCatalogItem,
+        errorFetchingItem: null,
+      });
+
+      renderWithTheme(<ServiceCatalogItem {...defaultProps} />);
+
+      expect(
+        screen.getByTestId("preview-mode-banner-mock")
+      ).toBeInTheDocument();
+      expect(screen.getByTestId("item-request-form")).toHaveAttribute(
+        "data-preview-mode",
+        "true"
+      );
+      expect(screen.getByRole("button", { name: "Submit" })).toBeDisabled();
+      expect(document.documentElement).toHaveClass(PREVIEW_CLASS);
+    });
+
+    it("removes the preview class from the root element on unmount", () => {
+      mockLocation("?preview=true");
+      mockUseServiceCatalogItem.mockReturnValue({
+        serviceCatalogItem: mockDraftServiceCatalogItem,
+        errorFetchingItem: null,
+      });
+
+      const { unmount } = renderWithTheme(
+        <ServiceCatalogItem {...defaultProps} />
+      );
+      expect(document.documentElement).toHaveClass(PREVIEW_CLASS);
+
+      unmount();
+      expect(document.documentElement).not.toHaveClass(PREVIEW_CLASS);
+    });
+
+    it("does not submit the form when in preview mode", async () => {
+      mockLocation("?preview=true");
+      mockUseServiceCatalogItem.mockReturnValue({
+        serviceCatalogItem: mockDraftServiceCatalogItem,
+        errorFetchingItem: null,
+      });
+
+      renderWithTheme(<ServiceCatalogItem {...defaultProps} />);
+
+      const form = screen.getByTestId("item-request-form");
+      fireEvent.submit(form);
+
+      await waitFor(() => {
+        expect(mockSubmitServiceItemRequest).not.toHaveBeenCalled();
+      });
     });
   });
 
@@ -176,7 +391,7 @@ describe("ServiceCatalogItem", () => {
                 {
                   description: "Field is required",
                   error: "BlankValue",
-                  field_key: 999, // Field not in the form
+                  field_id: 999, // Field not in the form
                 },
               ],
             },
@@ -215,7 +430,7 @@ describe("ServiceCatalogItem", () => {
                 {
                   description: "Field is required",
                   error: "BlankValue",
-                  field_key: 1, // Field IS in the form
+                  field_id: 1, // Field IS in the form
                 },
               ],
             },
@@ -240,6 +455,194 @@ describe("ServiceCatalogItem", () => {
           })
         );
       });
+    });
+
+    it("lights up the matching field with the backend error when field_id is present", async () => {
+      const setRequestFields = jest.fn();
+      mockUseItemFormFields.mockReturnValue({
+        requestFields: mockRequestFields,
+        associatedLookupField: mockAssociatedLookupField,
+        categoryLookupField: null,
+        error: null,
+        setRequestFields,
+        handleChange: jest.fn(),
+        isRequestFieldsLoading: false,
+        assetTypeHiddenValue: "",
+        isAssetTypeHidden: false,
+        assetTypeIds: [],
+        assetIds: [],
+      });
+
+      const errorResponse = {
+        ok: false,
+        status: 422,
+        json: () =>
+          Promise.resolve({
+            error: "RecordInvalid",
+            description: "Record validation errors",
+            details: {
+              base: [
+                {
+                  description: "Product name: cannot be blank",
+                  error: "cannot be blank",
+                  field_id: 1,
+                },
+              ],
+            },
+          }),
+      };
+
+      mockSubmitServiceItemRequest.mockResolvedValue(
+        errorResponse as unknown as Response
+      );
+
+      renderWithTheme(<ServiceCatalogItem {...defaultProps} />);
+
+      const form = screen.getByTestId("item-request-form");
+      fireEvent.submit(form);
+
+      await waitFor(() => {
+        expect(setRequestFields).toHaveBeenCalledWith(expect.any(Function));
+      });
+
+      // validateForm's client-side check also calls setRequestFields
+      // (clearing stale errors) before handleValidationErrors does, so we
+      // need the last call, not the first.
+      const calls = setRequestFields.mock.calls;
+      const updateFn = calls[calls.length - 1][0];
+      const result = updateFn(mockRequestFields);
+      expect(result).toEqual([
+        expect.objectContaining({
+          id: 1,
+          error: "Product name: cannot be blank",
+        }),
+      ]);
+    });
+
+    const renderLastNotifyMessage = () => {
+      const lastCall =
+        mockNotify.mock.calls[mockNotify.mock.calls.length - 1]?.[0];
+      return renderWithTheme(<>{lastCall?.message}</>);
+    };
+
+    it("should surface the underlying description when a 422 error has no field_id", async () => {
+      const errorResponse = {
+        ok: false,
+        status: 422,
+        json: () =>
+          Promise.resolve({
+            error: "RecordInvalid",
+            description: "Record validation errors",
+            details: {
+              base: [
+                {
+                  description: "What are you looking for? cannot be blank",
+                  error: "cannot be blank",
+                },
+              ],
+            },
+          }),
+      };
+
+      mockSubmitServiceItemRequest.mockResolvedValue(
+        errorResponse as unknown as Response
+      );
+
+      renderWithTheme(<ServiceCatalogItem {...defaultProps} />);
+
+      const form = screen.getByTestId("item-request-form");
+      fireEvent.submit(form);
+
+      await waitFor(() => {
+        expect(mockNotify).toHaveBeenCalledWith(
+          expect.objectContaining({
+            type: "error",
+            title: "Service couldn't be submitted",
+          })
+        );
+      });
+
+      renderLastNotifyMessage();
+      expect(
+        screen.getByText("What are you looking for? cannot be blank")
+      ).toBeInTheDocument();
+    });
+
+    it("should not show the refresh message when a 422 error has no field_id", async () => {
+      const errorResponse = {
+        ok: false,
+        status: 422,
+        json: () =>
+          Promise.resolve({
+            error: "RecordInvalid",
+            description: "Record validation errors",
+            details: {
+              base: [
+                {
+                  description: "Subject cannot be blank",
+                  error: "cannot be blank",
+                },
+              ],
+            },
+          }),
+      };
+
+      mockSubmitServiceItemRequest.mockResolvedValue(
+        errorResponse as unknown as Response
+      );
+
+      renderWithTheme(<ServiceCatalogItem {...defaultProps} />);
+
+      const form = screen.getByTestId("item-request-form");
+      fireEvent.submit(form);
+
+      await waitFor(() => {
+        expect(mockNotify).toHaveBeenCalled();
+      });
+
+      renderLastNotifyMessage();
+      expect(
+        screen.queryByText(/Refresh the page and try again/i)
+      ).not.toBeInTheDocument();
+    });
+
+    it("should show the refresh message when a 422 error references a field id not in the form", async () => {
+      const errorResponse = {
+        ok: false,
+        status: 422,
+        json: () =>
+          Promise.resolve({
+            error: "RecordInvalid",
+            description: "Record validation errors",
+            details: {
+              base: [
+                {
+                  description: "Field is required",
+                  error: "BlankValue",
+                  field_id: 999,
+                },
+              ],
+            },
+          }),
+      };
+
+      mockSubmitServiceItemRequest.mockResolvedValue(
+        errorResponse as unknown as Response
+      );
+
+      renderWithTheme(<ServiceCatalogItem {...defaultProps} />);
+
+      const form = screen.getByTestId("item-request-form");
+      fireEvent.submit(form);
+
+      await waitFor(() => {
+        expect(mockNotify).toHaveBeenCalled();
+      });
+
+      renderLastNotifyMessage();
+      expect(
+        screen.getByText(/Refresh the page and try again/i)
+      ).toBeInTheDocument();
     });
 
     it("should show error notification when 422 response JSON parsing fails", async () => {
@@ -295,6 +698,87 @@ describe("ServiceCatalogItem", () => {
       });
     });
 
+    it("should merge field errors onto the full field list via a functional update, preserving fields hidden by end-user conditions", async () => {
+      const mockSetRequestFields = jest.fn();
+      mockUseItemFormFields.mockReturnValue({
+        requestFields: mockRequestFields,
+        associatedLookupField: mockAssociatedLookupField,
+        categoryLookupField: null,
+        error: null,
+        setRequestFields: mockSetRequestFields,
+        handleChange: jest.fn(),
+        isRequestFieldsLoading: false,
+        assetTypeHiddenValue: "",
+        isAssetTypeHidden: false,
+        assetTypeIds: [],
+        assetIds: [],
+      });
+
+      const errorResponse = {
+        ok: false,
+        status: 422,
+        json: () =>
+          Promise.resolve({
+            error: "RecordInvalid",
+            description: "Record validation errors",
+            details: {
+              base: [
+                {
+                  description: "Field is required",
+                  error: "BlankValue",
+                  field_id: 1, // matches mockRequestFields[0]
+                },
+              ],
+            },
+          }),
+      };
+
+      mockSubmitServiceItemRequest.mockResolvedValue(
+        errorResponse as unknown as Response
+      );
+
+      renderWithTheme(<ServiceCatalogItem {...defaultProps} />);
+
+      const form = screen.getByTestId("item-request-form");
+      fireEvent.submit(form);
+
+      await waitFor(() => {
+        // validateForm's client-side check calls setRequestFields first
+        // (clearing stale errors); handleValidationErrors's merge is the
+        // subsequent call once the mocked 422 response resolves.
+        expect(mockSetRequestFields.mock.calls.length).toBeGreaterThanOrEqual(
+          2
+        );
+      });
+
+      // A field hidden by an end-user condition would be absent from the
+      // (visible-only) `requestFields` passed to the component, but must
+      // still exist in the full underlying list the functional update
+      // operates on.
+      const hiddenField: TicketFieldObject = {
+        id: 42,
+        name: "custom_fields_42",
+        type: "text",
+        description: "Hidden field",
+        label: "Hidden field",
+        required: false,
+        options: [],
+        value: "should be preserved",
+        error: null,
+      };
+      const fullFieldList = [...mockRequestFields, hiddenField];
+
+      const calls = mockSetRequestFields.mock.calls;
+      const updateFn = calls[calls.length - 1][0];
+      const result = updateFn(fullFieldList);
+
+      expect(result).toContainEqual(hiddenField);
+      expect(result).toHaveLength(fullFieldList.length);
+      expect(result.find((f: TicketFieldObject) => f.id === 1)?.error).toBe(
+        "Field is required"
+      );
+    });
+
     it("should show error notification for non-422 error responses", async () => {
       const errorResponse = {
         ok: false,
@@ -337,6 +821,52 @@ describe("ServiceCatalogItem", () => {
             message: "Give it a moment and try it again",
           })
         );
+      });
+    });
+  });
+
+  describe("request on behalf", () => {
+    // defaultProps.userId is 123; the mocked beneficiary has id "789".
+    const successResponse = {
+      ok: true,
+      json: () => Promise.resolve({ request: { id: 555 } }),
+    } as unknown as Response;
+
+    it("does not pass requesterId or note for a self request", async () => {
+      mockSubmitServiceItemRequest.mockResolvedValue(successResponse);
+
+      renderWithTheme(<ServiceCatalogItem {...defaultProps} />);
+
+      fireEvent.submit(screen.getByTestId("item-request-form"));
+
+      await waitFor(() => {
+        expect(mockSubmitServiceItemRequest).toHaveBeenCalled();
+      });
+
+      const callArgs = mockSubmitServiceItemRequest.mock.calls[0]!;
+      // requesterId is the 8th positional arg, onBehalfNote the 9th.
+      expect(callArgs[7]).toBeNull();
+      expect(callArgs[8]).toBeNull();
+    });
+
+    it("passes the beneficiary id and a submitter/user note when on behalf", async () => {
+      mockSubmitServiceItemRequest.mockResolvedValue(successResponse);
+
+      renderWithTheme(<ServiceCatalogItem {...defaultProps} />);
+
+      // Pick a beneficiary (id 789) different from the current user (123).
+      fireEvent.click(screen.getByTestId("select-beneficiary"));
+      fireEvent.submit(screen.getByTestId("item-request-form"));
+
+      await waitFor(() => {
+        expect(mockSubmitServiceItemRequest).toHaveBeenCalled();
+      });
+
+      const callArgs = mockSubmitServiceItemRequest.mock.calls[0]!;
+      expect(callArgs[7]).toBe(789);
+      expect(callArgs[8]).toEqual({
+        submitterLabel: expect.stringContaining("Submitter: {{name}}"),
+        requesterLabel: expect.stringContaining("Requester: {{name}}"),
       });
     });
   });

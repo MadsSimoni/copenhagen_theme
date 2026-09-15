@@ -1,7 +1,7 @@
 {
   "name": "personreg-Support",
   "author": "Zendesk",
-  "version": "4.30.3",
+  "version": "4.51.1",
   "api_version": 4,
   "default_locale": "en-us",
   "settings": [
@@ -394,6 +394,18 @@
           "type": "checkbox",
           "description": "follow_topic_description",
           "label": "follow_topic_label",
+          "value": true
+        }
+      ]
+    },
+    {
+      "label": "show_suggested_articles_label",
+      "variables": [
+        {
+          "identifier": "show_suggested_articles",
+          "type": "checkbox",
+          "description": "show_suggested_articles_in_new_request_form_description",
+          "label": "show_suggested_articles_label",
           "value": true
         }
       ]

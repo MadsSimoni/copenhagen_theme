@@ -1,5 +1,5 @@
 {
-  "cph-theme-ticket-fields.attachments.choose-file-label": "Choose a file or drag and drop here",
+  "cph-theme-ticket-fields.attachments.choose-file-label": "Izvēlieties failu vai velciet to šeit",
   "cph-theme-ticket-fields.attachments.drop-files-label": "Drop files here",
   "cph-theme-ticket-fields.attachments.error-separator": "; ",
   "cph-theme-ticket-fields.attachments.file": "File: {{fileName}}, press delete to remove",
@@ -16,5 +16,7 @@
   "cph-theme-ticket-fields.lookup-field.loading-options": "Loading items...",
   "cph-theme-ticket-fields.lookup-field.no-matches-found": "No matches found",
   "cph-theme-ticket-fields.lookup-field.placeholder": "Search {{label}}",
+  "cph-theme-ticket-fields.search-field.no-matches-found": "No matches found",
+  "cph-theme-ticket-fields.search-field.placeholder": "Search {{label}}",
   "cph-theme-ticket-fields.upload-failed-title": "{{fileName}} upload failed"
 }

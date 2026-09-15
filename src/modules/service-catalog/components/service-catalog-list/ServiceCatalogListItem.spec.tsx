@@ -18,6 +18,9 @@ describe("ServiceCatalogListItem", () => {
     description: "This is a keyboard &quot;from&quot; Atl Nacional",
     form_id: 456,
     thumbnail_url: "",
+    categories: [],
+    is_request_on_behalf: false,
+    published_at: "2025-01-01T00:00:00Z",
     custom_object_fields: {
       "standard::asset_option": "",
       "standard::asset_type_option": "",
@@ -69,15 +72,37 @@ describe("ServiceCatalogListItem", () => {
         />
       );
 
-      const itemContainer = screen.getByTestId(
-        "service-catalog-list-item-container"
-      );
-      expect(itemContainer).toHaveStyle(
+      const linkElement = screen.getByRole("link");
+      expect(linkElement).toHaveStyle(
         `color: ${getColor({
           theme: testTheme,
           variable: "foreground.default",
         })}`
       );
+    });
+
+    it("should render name and description as text without executing HTML payloads", () => {
+      const onError = jest.fn();
+      (window as unknown as { __xss?: () => void }).__xss = onError;
+
+      render(
+        <ServiceCatalogListItem
+          serviceItem={{
+            ...mockServiceItem,
+            name: '<img src=x onerror="window.__xss()">Order a laptop',
+            description:
+              '<img src=x onerror="window.__xss()">Malicious description',
+          }}
+          helpCenterPath={mockHelpCenterPath}
+        />
+      );
+
+      expect(onError).not.toHaveBeenCalled();
+      expect(screen.getByText("Order a laptop")).toBeInTheDocument();
+      expect(screen.getByText("Malicious description")).toBeInTheDocument();
+      expect(document.querySelector("img[onerror]")).toBeNull();
+
+      delete (window as unknown as { __xss?: () => void }).__xss;
     });
 
     it("should use primaryHue as card border color on hover", async () => {
@@ -89,17 +114,15 @@ describe("ServiceCatalogListItem", () => {
       );
 
       const user = userEvent.setup();
-      const itemContainer = screen.getByTestId(
-        "service-catalog-list-item-container"
-      );
+      const linkElement = screen.getByRole("link");
       const defaultBorderColor = testTheme.palette.grey?.[300];
 
       expect(defaultBorderColor).toBeTruthy();
-      expect(itemContainer).toHaveStyle(`border-color: ${defaultBorderColor}`);
+      expect(linkElement).toHaveStyle(`border-color: ${defaultBorderColor}`);
 
-      await user.hover(itemContainer);
+      await user.hover(linkElement);
 
-      expect(itemContainer).toHaveStyle(
+      expect(linkElement).toHaveStyle(
         `border-color: ${testTheme.colors.primaryHue}`
       );
     });
