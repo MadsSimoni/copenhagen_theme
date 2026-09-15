@@ -1,3 +1,19 @@
+{{#unless article.internal}}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": {{json article.title}},
+  "datePublished": {{json article.created_at}},
+  "dateModified": {{json article.edited_at}},
+  "inLanguage": {{json article.locale}},
+  "articleSection": {{json section.name}},
+  {{#if settings.show_article_author}}"author": { "@type": "Person", "name": {{json article.author.name}} },
+  {{else}}"author": { "@type": "Organization", "name": "Folkekirkens It - IT-Support" },
+  {{/if}}"publisher": { "@type": "Organization", "name": "Folkekirkens It" }
+}
+</script>
+{{/unless}}
 <div class="container-divider"></div>
 <div class="container">
   <div class="sub-nav">
