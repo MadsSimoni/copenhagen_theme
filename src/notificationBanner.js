@@ -2,7 +2,7 @@
 // Shows published articles with the label "drift" as a dismissible banner in `.alertbox`
 
 // Article labels to be considered for the alerts
-const LABELS = "drift,Drift";
+const LABELS = "drift";
 const STORAGE_PREFIX = "notification-banner-closed-";
 
 // sessionStorage throws when the browser blocks site data, so the banner must not depend on it
