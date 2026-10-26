@@ -3,6 +3,76 @@
 
 // Article labels to be considered for the alerts
 const LABELS = "drift,Drift";
+const STORAGE_PREFIX = "notification-banner-closed-";
+
+// sessionStorage throws when the browser blocks site data, so the banner must not depend on it
+function isClosed(articleId) {
+  try {
+    return sessionStorage.getItem(STORAGE_PREFIX + articleId) === "closed";
+  } catch (e) {
+    return false;
+  }
+}
+
+function rememberClosed(articleId) {
+  try {
+    sessionStorage.setItem(STORAGE_PREFIX + articleId, "closed");
+  } catch (e) {
+    // Banner stays closed until the next page load
+  }
+}
+
+// Built with DOM methods so article titles are always treated as text, never as HTML
+function createBanner(article) {
+  const banner = document.createElement("div");
+  banner.className = "ns-box";
+  banner.setAttribute("data-article-id", article.id);
+
+  const icon = document.createElement("span");
+  icon.className = "ns-icon";
+  icon.setAttribute("aria-hidden", "true");
+
+  const text = document.createElement("p");
+  text.className = "ns-text";
+
+  const link = document.createElement("a");
+  link.href = article.html_url;
+  link.textContent = article.title;
+
+  text.appendChild(link);
+  text.appendChild(document.createTextNode(" - Læs mere"));
+
+  const close = document.createElement("button");
+  close.type = "button";
+  close.className = "ns-close";
+  close.setAttribute("aria-label", `Luk driftsmeddelelse: ${article.title}`);
+
+  banner.appendChild(icon);
+  banner.appendChild(text);
+  banner.appendChild(close);
+
+  return banner;
+}
+
+// Move focus somewhere sensible, since the focused close button is removed from the page
+function moveFocusAfterClose(region, banner) {
+  const next = banner.nextElementSibling || banner.previousElementSibling;
+
+  if (next) {
+    next.querySelector(".ns-close").focus();
+    return;
+  }
+
+  region.remove();
+
+  const main = document.getElementById("main-content");
+  if (main) {
+    if (!main.hasAttribute("tabindex")) {
+      main.setAttribute("tabindex", "-1");
+    }
+    main.focus();
+  }
+}
 
 window.addEventListener("DOMContentLoaded", () => {
   const alertbox = document.querySelector(".alertbox");
@@ -14,36 +84,46 @@ window.addEventListener("DOMContentLoaded", () => {
   const url = `/api/v2/help_center/${locale}/articles.json?label_names=${LABELS}`;
 
   fetch(url)
-    .then((response) => response.json())
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(
+          `Notification banner request failed: ${response.status}`
+        );
+      }
+      return response.json();
+    })
     .then((data) => {
-      const articles = (data && data.articles) || [];
+      const articles = ((data && data.articles) || []).filter(
+        (article) => !isClosed(article.id)
+      );
+
+      if (articles.length === 0) {
+        return;
+      }
+
+      const region = document.createElement("section");
+      region.className = "notification-banner";
+      region.setAttribute("aria-label", "Driftsmeddelelser");
 
       articles.forEach((article) => {
-        if (sessionStorage.getItem(article.id) === "closed") {
+        region.appendChild(createBanner(article));
+      });
+
+      region.addEventListener("click", (event) => {
+        const close = event.target.closest(".ns-close");
+        if (!close) {
           return;
         }
 
-        const html = `
-          <div id=${article.id} class="ns-box ns-bar ns-effect-slidetop ns-type-notice ns-show">
-            <div class="ns-box-inner">
-              <span class="megaphone"></span>
-              <p>
-                <a href="${article.html_url}">${article.title} | Tryk her for at læse mere</a>
-              </p>
-            </div>
-            <span class="ns-close"></span>
-          </div>
-        `;
-        alertbox.insertAdjacentHTML("beforeend", html);
+        const banner = close.closest(".ns-box");
+        rememberClosed(banner.getAttribute("data-article-id"));
+        moveFocusAfterClose(region, banner);
+        banner.remove();
       });
-    });
-});
 
-// Close alert and remember it for the rest of the session
-document.addEventListener("click", (event) => {
-  if (event.target.matches(".ns-close")) {
-    event.preventDefault();
-    sessionStorage.setItem(event.target.parentElement.id, "closed");
-    event.target.parentElement.remove();
-  }
+      alertbox.appendChild(region);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 });

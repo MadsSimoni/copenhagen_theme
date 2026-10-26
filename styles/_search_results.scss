@@ -212,10 +212,17 @@
     }
 
     nav {
-      @include desktop { flex: 1; }
+      @include desktop {
+        flex: 1;
+        min-width: 0;
+      }
     }
 
     .meta-data {
+      // Keep the date on one line instead of letting long breadcrumbs squeeze it
+      flex-shrink: 0;
+      white-space: nowrap;
+
       [dir="ltr"] & {
         @include desktop { margin-left: 20px; }
       }
@@ -232,6 +239,17 @@
 
   &-breadcrumbs {
     margin: 0;
+    // Let the path flow as text so long names wrap mid-line instead of each item jumping to its own line
+    display: block;
+
+    li {
+      display: inline;
+      max-width: none;
+
+      + li::before {
+        margin-inline-start: 0;
+      }
+    }
   }
 
   &-description {
